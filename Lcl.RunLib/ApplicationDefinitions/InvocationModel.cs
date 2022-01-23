@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lcl.RunLib
+namespace Lcl.RunLib.ApplicationDefinitions
 {
   /// <summary>
   /// Editable model for the parameters of a process invocation.
