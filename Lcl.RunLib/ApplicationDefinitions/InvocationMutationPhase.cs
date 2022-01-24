@@ -43,14 +43,14 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// <summary>
     /// The command
     /// </summary>
-    [JsonProperty("command")]
+    [JsonProperty("command", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public string? Command { get; }
 
     /// <summary>
     /// Whether or not the path of the executable should be automatically
     /// prepended to the PATH.
     /// </summary>
-    [JsonProperty("prepend-command-path")]
+    [JsonProperty("prepend-command-path", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public bool? PrependCommandPath { get; }
 
     /// <summary>

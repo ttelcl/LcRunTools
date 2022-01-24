@@ -1,0 +1,44 @@
+﻿{
+  "#comments-01": [
+    "Convention for these examples: JSON properties starting with '#' are just",
+    "comments, not actual content."
+  ],
+
+  "#comments-02": [
+    "This example is a single-file appdef, simplified from the ffmpeg sample"
+  ],
+
+  "base": null,
+
+  "tobase": {
+  },
+
+  "frombase": {
+    "command": "c:\\bin\\ffmpeg\\bin\\ffmpeg.exe",
+
+    "prepend-command-path": false,
+
+    "vars": {
+      "FFMPEGPATH": "c:\\bin\\ffmpeg\\bin"
+    },
+
+    "lists": {
+      "PATH": {
+        "sep": ";",
+
+        "prepend": [
+          "c:\\bin\\ffmpeg\\bin"
+        ],
+
+        "append": [
+        ]
+      }
+    },
+
+    "args": {
+      "prepend": [
+        "-hide_banner"
+      ]
+    }
+  }
+}
