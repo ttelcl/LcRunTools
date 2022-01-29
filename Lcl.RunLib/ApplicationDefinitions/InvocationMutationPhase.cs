@@ -28,14 +28,14 @@ namespace Lcl.RunLib.ApplicationDefinitions
       [JsonProperty("prepend-command-path")]
       bool? prependCommandPath = null,
       [JsonProperty("vars")]
-      Dictionary<string, string>? plainVariables = null,
+      Dictionary<string, string?>? plainVariables = null,
       [JsonProperty("lists")]
       Dictionary<string, ListVarMutation>? listVariables = null,
       ListMutation? args = null)
     {
       Command = command;
       PrependCommandPath = prependCommandPath;
-      PlainVariableMutations = plainVariables ?? new Dictionary<string, string>();
+      PlainVariableMutations = plainVariables ?? new Dictionary<string, string?>();
       ListVariableMutations = listVariables ?? new Dictionary<string, ListVarMutation>();
       ArgumentListMutations = args ?? new ListMutation();
     }
@@ -57,7 +57,7 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// Mutations to plain (non-list) variables
     /// </summary>
     [JsonProperty("vars")]
-    public IReadOnlyDictionary<string, string> PlainVariableMutations { get; }
+    public IReadOnlyDictionary<string, string?> PlainVariableMutations { get; }
 
     /// <summary>
     /// Mutations to list-valued variables
@@ -96,6 +96,56 @@ namespace Lcl.RunLib.ApplicationDefinitions
     public bool ShouldSerializeArgumentListMutations()
     {
       return ArgumentListMutations.Prepend.Count + ArgumentListMutations.Append.Count > 0;
+    }
+
+    /// <summary>
+    /// Applies the mutations defined in this phase to the model.
+    /// Does not "finalize" the mutations (e.g.: does not prepend the command
+    /// path if requested)
+    /// </summary>
+    public void ApplyTo(InvocationModel model)
+    {
+      if(Command != null)
+      {
+        if(model.Executable != null)
+        {
+          throw new InvalidOperationException(
+            $"Duplicate definition of the command to excute: '{model.Executable}' and '{Command}'");
+        }
+        model.Executable = Command;
+      }
+      if(PrependCommandPath.HasValue)
+      {
+        model.PrependCommandPath = PrependCommandPath.Value;
+      }
+
+      // Processing a list variable may change an existing plain variable into a list variable
+      // The reverse is not true. However, plain variables are processed first.
+
+      foreach(var plainKvp in PlainVariableMutations)
+      {
+        var varName = plainKvp.Key;
+        var varValue = plainKvp.Value;
+        if(model.ListSeparators.ContainsKey(varName))
+        {
+          // We throw an error here for the sake of simplicity. model.SetVariable
+          // actually supports setting a variable that is a list, but disallowing that
+          // is probably more foolproof
+          throw new InvalidOperationException(
+            $"Attempt to use list variable '{varName}' as a plain variable");
+        }
+        model.SetVariable(varName, varValue);
+      }
+
+      foreach(var listKvp in ListVariableMutations)
+      {
+        var varName = listKvp.Key;
+        var lm = listKvp.Value;
+        var list = model.DeclareList(varName, lm.Separator);
+        lm.Apply(list);
+      }
+
+      ArgumentListMutations.Apply(model.Arguments);
     }
   }
 }

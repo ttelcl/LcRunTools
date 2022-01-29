@@ -94,7 +94,8 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// <summary>
     /// Declare a variable as list variable and define its separator. Throws an exception
     /// if a conflicting separator was defined before. If a plain variable by this name
-    /// exists, it is split and migrated to become a list variable
+    /// exists, it is split and migrated to become a list variable. If not initialized yet,
+    /// the value is set to an empty list
     /// </summary>
     /// <param name="name">
     /// The name of the variable
@@ -102,7 +103,11 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// <param name="separator">
     /// The separator to use. Currently only ':', ';', ',', ' ' and '|' are allowed
     /// </param>
-    public void DeclareList(string name, char separator)
+    /// <returns>
+    /// The value of the list variable (pre-existing, transformed-from-plain, or 
+    /// newly-empty-initialized)
+    /// </returns>
+    public List<string> DeclareList(string name, char separator)
     {
       if(":;, |".IndexOf(separator) < 0)
       {
@@ -128,15 +133,23 @@ namespace Lcl.RunLib.ApplicationDefinitions
         _listVariables[name] = value.Split(separator).ToList();
         _plainVariables.Remove(name);
       }
-      // else: leave _listVariables[name] uninitialized or unmodified
+      else if(_listVariables.TryGetValue(name, out var lv))
+      {
+        // leave as is
+      }
+      else
+      {
+        _listVariables[name] = new List<string>();
+      }
+      return _listVariables[name];
     }
 
     /// <summary>
     /// Shorthand for DeclareList(name, DefaultListSeparator);
     /// </summary>
-    public void DeclareList(string name)
+    public List<string> DeclareList(string name)
     {
-      DeclareList(name, DefaultListSeparator);
+      return DeclareList(name, DefaultListSeparator);
     }
 
     /// <summary>
@@ -195,6 +208,50 @@ namespace Lcl.RunLib.ApplicationDefinitions
       else
       {
         _listVariables[name] = new List<string>(values);
+      }
+    }
+
+    /// <summary>
+    /// Finish all the values represented by this model: perform checks,
+    /// apply PrependCommandPath, translate all list variables back to plain variables
+    /// </summary>
+    public void Finish()
+    {
+      if(String.IsNullOrEmpty(Executable))
+      {
+        throw new InvalidOperationException("No command specified.");
+      }
+      if(!Path.IsPathFullyQualified(Executable))
+      {
+        throw new InvalidOperationException(
+          $"The command path must be fully specified");
+      }
+      if(PrependCommandPath)
+      {
+        var cmdpath = Path.GetDirectoryName(Executable);
+        if(cmdpath == null)
+        {
+          throw new InvalidOperationException(
+            "Internal error");
+        }
+        var pathlist = DeclareList("PATH"); // the safe way to handle multiple calls to Finish()!
+        pathlist.Insert(0, cmdpath);
+      }
+      var listNames = ListSeparators.Keys.ToList();
+      foreach(var listName in listNames)
+      {
+        var sep = ListSeparators[listName];
+        var list = ListVariables[listName];
+        _listVariables.Remove(listName);
+        _listSeparators.Remove(listName);
+        if(list == null || list.Count == 0)
+        {
+          // _plainVariables[listName] = null;
+        }
+        else
+        {
+          _plainVariables[listName] = String.Join(sep, list);
+        }
       }
     }
 

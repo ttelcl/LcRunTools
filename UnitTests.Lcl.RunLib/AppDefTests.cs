@@ -94,6 +94,22 @@ namespace UnitTests.Lcl.RunLib
       }
     }
 
+    [Fact]
+    public void CanLoadSingleNodeChain()
+    {
+      var defname = "test-single";
+      var cwd = Environment.CurrentDirectory;
+      var store = new AppdefStore(cwd, null);
+
+      var chain = store.LoadAppdef(defname);
+      Assert.NotNull(chain);
+      Assert.Null(chain.BaseNode);
+      Assert.NotNull(chain.Content);
+      Assert.Equal(defname, chain.Tag);
+
+      _output.WriteLine($"Matched tag '{defname}' as file: {chain.FileName}");
+    }
+
     private static T TagAsNotNull<T>(T? t)
       where T : class
     {

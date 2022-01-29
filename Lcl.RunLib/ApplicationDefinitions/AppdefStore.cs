@@ -155,29 +155,28 @@ namespace Lcl.RunLib.ApplicationDefinitions
 
     /// <summary>
     /// Load an application definition by its tag, as well as all its base 
-    /// application definitions
+    /// application definitions, and return them as an 
+    /// InvocationMutationNode (a linked list)
     /// </summary>
     /// <param name="tag">
     /// The tag of the main application definition
     /// </param>
     /// <returns>
-    /// A list of application definitions in the chain, starting with the main definition
-    /// and ending with the final base definition.
+    /// An InvocationMutationNode: effectively a linked list of InvocationMutation
+    /// instances
     /// </returns>
     /// <exception cref="InvalidOperationException">
     /// Thrown when the application definition or any of its bases cannot be found, or
     /// if a cyclical dependency is encountered, or if an invalid tag is encountered.
     /// </exception>
-    public IReadOnlyList<InvocationMutation> LoadAppdef(
+    public InvocationMutationNode LoadAppdef(
       string tag)
     {
-      var list = new List<InvocationMutation>();
       var checkSet = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-      LoadAppdefInto(tag, list, checkSet);
-      return list.AsReadOnly();
+      return LoadAppdefNode(tag, checkSet);
     }
 
-    private void LoadAppdefInto(string tag, List<InvocationMutation> list, HashSet<string> checkSet)
+    private InvocationMutationNode LoadAppdefNode(string tag, HashSet<string> checkSet)
     {
       if(checkSet.Contains(tag))
       {
@@ -190,15 +189,15 @@ namespace Lcl.RunLib.ApplicationDefinitions
         checkSet.Add(tag);
         var json = File.ReadAllText(file);
         var im = InvocationMutation.FromJson(json);
-        list.Add(im);
         if(String.IsNullOrEmpty(im.BaseName))
         {
-          return;
+          return new InvocationMutationNode(null, file, tag, im);
         }
         else
         {
           // recurse
-          LoadAppdefInto(im.BaseName, list, checkSet);
+          var baseNode = LoadAppdefNode(im.BaseName, checkSet);
+          return new InvocationMutationNode(baseNode, file, tag, im);
         }
       }
       else
@@ -208,7 +207,7 @@ namespace Lcl.RunLib.ApplicationDefinitions
           // Note: it is intentional that once a parent store is used, further
           // base application definitions are only sought there (or its further
           // parent stores), but search never returns to this "child" store.
-          Parent.LoadAppdefInto(tag, list, checkSet);
+          return Parent.LoadAppdefNode(tag, checkSet);
         }
         else
         {
@@ -217,5 +216,6 @@ namespace Lcl.RunLib.ApplicationDefinitions
         }
       }
     }
+
   }
 }
