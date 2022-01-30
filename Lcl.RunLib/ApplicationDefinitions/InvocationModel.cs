@@ -19,12 +19,14 @@ namespace Lcl.RunLib.ApplicationDefinitions
   /// </summary>
   public class InvocationModel
   {
+    private static readonly StringComparer __varNameComparer =
+      RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+      ? StringComparer.InvariantCultureIgnoreCase
+      : StringComparer.InvariantCulture;
     private readonly Dictionary<string, char> _listSeparators =
-      new Dictionary<string, char>(StringComparer.InvariantCultureIgnoreCase);
-    private readonly Dictionary<string, List<string>> _listVariables
-      = new Dictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
-    private readonly Dictionary<string, string> _plainVariables
-      = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+      new Dictionary<string, char>(__varNameComparer);
+    private readonly Dictionary<string, string?> _variables
+      = new Dictionary<string, string?>(__varNameComparer);
 
     /// <summary>
     /// Create a new InvocationModel
@@ -34,14 +36,24 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// </param>
     public InvocationModel(IEnumerable<string> arguments)
     {
-      DefaultListSeparator =
-        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ';' : ':';
       Executable = null;
       PrependCommandPath = true;
       Arguments = new List<string>(arguments);
       WorkingDirectory = Environment.CurrentDirectory;
       _listSeparators["PATH"] = DefaultListSeparator;
     }
+
+    /// <summary>
+    /// The comparer for environment variable names. Case insensitive on windows
+    /// and case sensitive on non-windows systems
+    /// </summary>
+    public static StringComparer VariableNameComparer { get => __varNameComparer;}
+    
+    /// <summary>
+    /// The default list separator character (depending on operating system)
+    /// </summary>
+    public static char DefaultListSeparator { get; } = 
+      RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ';' : ':';
 
     /// <summary>
     /// The full path to the executable to run, or null if not yet defined
@@ -55,11 +67,6 @@ namespace Lcl.RunLib.ApplicationDefinitions
     public bool PrependCommandPath { get; set; }
 
     /// <summary>
-    /// The default list separator character (depending on operating system)
-    /// </summary>
-    public char DefaultListSeparator { get; }
-
-    /// <summary>
     /// The mapping from environment variable names to list separator characters
     /// for list-valued environment variables. Being listed in this ditctionary
     /// implies the variable should be treated as a list.
@@ -69,16 +76,10 @@ namespace Lcl.RunLib.ApplicationDefinitions
     public IReadOnlyDictionary<string, char> ListSeparators { get => _listSeparators; }
 
     /// <summary>
-    /// Environment variables that are to be treated as lists. Each entry must have a matching
-    /// entry in ListSeparators, and no matching entry in PlainVariables
+    /// The environment variables. A value that is null explicitly indicates a deleted
+    /// variable.
     /// </summary>
-    public IReadOnlyDictionary<string, List<string>> ListVariables { get => _listVariables; }
-
-    /// <summary>
-    /// Environment variables that are to be treated as plain strings, not lists.
-    /// Entries must *not* also match entries in ListSeparators and ListVariables
-    /// </summary>
-    public IReadOnlyDictionary<string, string> PlainVariables { get => _plainVariables; }
+    public IDictionary<string, string?> Variables { get => _variables; }
 
     /// <summary>
     /// The list of arguments
@@ -92,128 +93,114 @@ namespace Lcl.RunLib.ApplicationDefinitions
     public string WorkingDirectory { get; set; }
 
     /// <summary>
-    /// Declare a variable as list variable and define its separator. Throws an exception
-    /// if a conflicting separator was defined before. If a plain variable by this name
-    /// exists, it is split and migrated to become a list variable. If not initialized yet,
-    /// the value is set to an empty list
+    /// Tag the named variable as using the specified list separator and return
+    /// the current effective value of the variable as a list.
     /// </summary>
-    /// <param name="name">
-    /// The name of the variable
+    /// <param name="varname">
+    /// The name of the variable. Case-sensitivity depends on the operating system.
     /// </param>
     /// <param name="separator">
-    /// The separator to use. Currently only ':', ';', ',', ' ' and '|' are allowed
+    /// The list separator to use for this variable.
+    /// Must be one of ':', ';', ',', ' ', or '|'.
     /// </param>
     /// <returns>
-    /// The value of the list variable (pre-existing, transformed-from-plain, or 
-    /// newly-empty-initialized)
+    /// If the variable did not exist or was empty: an empty list.
+    /// Otherwise: the value of the variable split into a list by the specified
+    /// separator
     /// </returns>
-    public List<string> DeclareList(string name, char separator)
+    /// <exception cref="ArgumentException">
+    /// Thrown if the separator is not one of ':', ';', ',', ' ', or '|'
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if the separator conflicts with a previously specified separator for the
+    /// same variable
+    /// </exception>
+    public List<string> GetAsList(string varname, char separator)
     {
       if(":;, |".IndexOf(separator) < 0)
       {
         throw new ArgumentException(
           $"Invalid value for 'separator'", nameof(separator));
       }
-      if(_listSeparators.TryGetValue(name, out var oldsep))
+      if(_listSeparators.TryGetValue(varname, out var oldsep))
       {
         if(oldsep != separator)
         {
           throw new InvalidOperationException(
-            $"Conflicting list separator declaration for '{name}': cannot redeclare " +
+            $"Conflicting list separator declaration for '{varname}': cannot redeclare " +
             $"as '{separator}' after previously declaring as '{oldsep}'");
         }
         // else: NOP
       }
       else
       {
-        _listSeparators[name] = separator;
+        _listSeparators[varname] = separator;
       }
-      if(_plainVariables.TryGetValue(name, out var value))
+      if(_variables.TryGetValue(varname, out var value) && !String.IsNullOrEmpty(value))
       {
-        _listVariables[name] = value.Split(separator).ToList();
-        _plainVariables.Remove(name);
-      }
-      else if(_listVariables.TryGetValue(name, out var lv))
-      {
-        // leave as is
+        return value.Split(separator).ToList();
       }
       else
       {
-        _listVariables[name] = new List<string>();
-      }
-      return _listVariables[name];
-    }
-
-    /// <summary>
-    /// Shorthand for DeclareList(name, DefaultListSeparator);
-    /// </summary>
-    public List<string> DeclareList(string name)
-    {
-      return DeclareList(name, DefaultListSeparator);
-    }
-
-    /// <summary>
-    /// Set, replace or remove a plain or list variable. If the variable is known
-    /// to be a list, the value is split according to the separator
-    /// </summary>
-    /// <param name="name">
-    /// The name of the variable
-    /// </param>
-    /// <param name="value">
-    /// The new value of the plain variable, the serialized form of the new value
-    /// of the the list variable, or null to delete the variable.
-    /// </param>
-    public void SetVariable(string name, string? value)
-    {
-      if(_listSeparators.TryGetValue(name, out var separator))
-      {
-        if(value == null)
-        {
-          _listVariables.Remove(name);
-        }
-        else
-        {
-          _listVariables[name] = value.Split(separator).ToList();
-        }
-      }
-      else
-      {
-        if(value == null)
-        {
-          _plainVariables.Remove(name);
-        }
-        else
-        {
-          _plainVariables[name] = value;
-        }
+        return new List<string>();
       }
     }
 
     /// <summary>
-    /// Set, replace, or delete the value of a list variable
+    /// Set an environment variable to a value constructed from a list using the
+    /// specified separator
     /// </summary>
-    /// <param name="name">
-    /// The name of the list variable
+    /// <param name="varname">
+    /// The name of the variable (case-sensitivity depends on operating system)
     /// </param>
-    /// <param name="values">
-    /// The new list of variables, or null to delete the variable
+    /// <param name="separator">
+    /// The separator to use
     /// </param>
-    public void SetListVariable(string name, IEnumerable<string>? values)
+    /// <param name="list">
+    /// The sequence of values to store. Or null to mark the variable for deletion
+    /// </param>
+    /// <exception cref="ArgumentException">
+    /// Thrown if the separator is not one of ':', ';', ',', ' ', or '|'
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if the separator conflicts with a previously specified separator for the
+    /// same variable
+    /// </exception>
+    public void SetAsList(string varname, char separator, IEnumerable<string>? list)
     {
-      var _ = RequireSeparator(name);
-      if(values == null)
+      if(":;, |".IndexOf(separator) < 0)
       {
-        _listVariables.Remove(name);
+        throw new ArgumentException(
+          $"Invalid value for 'separator'", nameof(separator));
+      }
+      if(_listSeparators.TryGetValue(varname, out var oldsep))
+      {
+        if(oldsep != separator)
+        {
+          throw new InvalidOperationException(
+            $"Conflicting list separator declaration for '{varname}': cannot redeclare " +
+            $"as '{separator}' after previously declaring as '{oldsep}'");
+        }
+        // else: NOP
       }
       else
       {
-        _listVariables[name] = new List<string>(values);
+        _listSeparators[varname] = separator;
+      }
+      if(list == null)
+      {
+        _variables[varname] = null;
+      }
+      else
+      {
+        var value = String.Join(separator, list);
+        _variables[varname] = value;
       }
     }
 
     /// <summary>
     /// Finish all the values represented by this model: perform checks,
-    /// apply PrependCommandPath, translate all list variables back to plain variables
+    /// apply PrependCommandPath
     /// </summary>
     public void Finish()
     {
@@ -234,38 +221,10 @@ namespace Lcl.RunLib.ApplicationDefinitions
           throw new InvalidOperationException(
             "Internal error");
         }
-        var pathlist = DeclareList("PATH"); // the safe way to handle multiple calls to Finish()!
+        var pathlist = GetAsList("PATH", DefaultListSeparator);
         pathlist.Insert(0, cmdpath);
       }
       var listNames = ListSeparators.Keys.ToList();
-      foreach(var listName in listNames)
-      {
-        var sep = ListSeparators[listName];
-        var list = ListVariables[listName];
-        _listVariables.Remove(listName);
-        _listSeparators.Remove(listName);
-        if(list == null || list.Count == 0)
-        {
-          // _plainVariables[listName] = null;
-        }
-        else
-        {
-          _plainVariables[listName] = String.Join(sep, list);
-        }
-      }
-    }
-
-    private char RequireSeparator(string name)
-    {
-      if(_listSeparators.TryGetValue(name, out var separator))
-      {
-        return separator;
-      }
-      else
-      {
-        throw new InvalidOperationException(
-          $"The variable '{name}' is used as list variable but no list separator has been declared for it");
-      }
     }
 
 

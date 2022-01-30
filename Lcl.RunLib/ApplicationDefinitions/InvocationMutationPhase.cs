@@ -126,23 +126,16 @@ namespace Lcl.RunLib.ApplicationDefinitions
       {
         var varName = plainKvp.Key;
         var varValue = plainKvp.Value;
-        if(model.ListSeparators.ContainsKey(varName))
-        {
-          // We throw an error here for the sake of simplicity. model.SetVariable
-          // actually supports setting a variable that is a list, but disallowing that
-          // is probably more foolproof
-          throw new InvalidOperationException(
-            $"Attempt to use list variable '{varName}' as a plain variable");
-        }
-        model.SetVariable(varName, varValue);
+        model.Variables[varName] = varValue;
       }
 
       foreach(var listKvp in ListVariableMutations)
       {
         var varName = listKvp.Key;
         var lm = listKvp.Value;
-        var list = model.DeclareList(varName, lm.Separator);
+        var list = model.GetAsList(varName, lm.Separator);
         lm.Apply(list);
+        model.SetAsList(varName, lm.Separator, list);
       }
 
       ArgumentListMutations.Apply(model.Arguments);
