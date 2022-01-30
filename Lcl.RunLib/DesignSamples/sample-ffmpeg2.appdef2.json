@@ -1,0 +1,42 @@
+﻿{
+  "#comments-01": [
+    "Convention for this example: JSON properties starting with '#' are just",
+    "comments, not actual content."
+  ],
+
+  "#comments-02": [
+    "This is an alternative design for AppDef files.",
+    "NOT USED"
+  ],
+
+  "base": null,
+
+  "tobase": {
+  },
+
+  "frombase": {
+    "environment": {
+      "set": {
+        "FFMPEGPATH": "c:\\bin\\ffmpeg\\bin"
+      },
+      "sep": {
+        "PATH": ";"
+      },
+      "prepend": {
+        "PATH": [
+          "c:\\bin\\ffmpeg\\bin"
+        ]
+      }
+    },
+
+    "args": {
+      "prepend": [
+        "-hide_banner"
+      ]
+    }
+
+  }
+
+
+
+}
