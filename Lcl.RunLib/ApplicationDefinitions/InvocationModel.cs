@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Lcl.RunLib.ApplicationDefinitions
@@ -21,32 +22,51 @@ namespace Lcl.RunLib.ApplicationDefinitions
   {
     private static readonly StringComparer __varNameComparer =
       RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-      ? StringComparer.InvariantCultureIgnoreCase
-      : StringComparer.InvariantCulture;
+      ? StringComparer.OrdinalIgnoreCase
+      : StringComparer.Ordinal;
     private readonly Dictionary<string, char> _listSeparators =
       new Dictionary<string, char>(__varNameComparer);
     private readonly Dictionary<string, string?> _variables
       = new Dictionary<string, string?>(__varNameComparer);
 
     /// <summary>
-    /// Create a new InvocationModel
+    /// Create a new InvocationModel. Only the arguments are populated and
+    /// "PATH" is tagged as using the system default separator.
+    /// Environment variables are not imported.
+    /// Use the Create() pseudoconstructore to also import environment variables
     /// </summary>
     /// <param name="arguments">
     /// The initial arguments
     /// </param>
-    public InvocationModel(IEnumerable<string> arguments)
+    public InvocationModel(IEnumerable<string>? arguments)
     {
       Executable = null;
       PrependCommandPath = true;
-      Arguments = new List<string>(arguments);
+      Arguments = arguments == null ? new List<string>() : new List<string>(arguments);
       WorkingDirectory = Environment.CurrentDirectory;
       _listSeparators["PATH"] = DefaultListSeparator;
+    }
+
+    /// <summary>
+    /// Create a new InvocationModel wrapping the specified initial argument list
+    /// and importing the current process' environment variables.
+    /// </summary>
+    public static InvocationModel CreateDefault(IEnumerable<string>? arguments)
+    {
+      var im = new InvocationModel(arguments);
+      var e = Environment.GetEnvironmentVariables();
+      foreach(System.Collections.DictionaryEntry kvp in e)
+      {
+        im.Variables[(string)kvp.Key] = (string?)kvp.Value;
+      }
+      return im;
     }
 
     /// <summary>
     /// The comparer for environment variable names. Case insensitive on windows
     /// and case sensitive on non-windows systems
     /// </summary>
+    [JsonIgnore]
     public static StringComparer VariableNameComparer { get => __varNameComparer;}
     
     /// <summary>

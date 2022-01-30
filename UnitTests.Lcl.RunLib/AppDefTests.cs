@@ -110,6 +110,62 @@ namespace UnitTests.Lcl.RunLib
       _output.WriteLine($"Matched tag '{defname}' as file: {chain.FileName}");
     }
 
+    [Fact]
+    public void CanCreateInvocationModel()
+    {
+      var im = InvocationModel.CreateDefault(null);
+      Assert.NotNull(im);
+      _output.WriteLine($"There are {im.Variables.Count} environment variables");
+      Assert.True(im.Variables.ContainsKey("PATH"));
+      var path = im.Variables["PATH"];
+      var pathlist = im.GetAsList("PATH", InvocationModel.DefaultListSeparator);
+      Assert.NotNull(pathlist);
+      _output.WriteLine($"There are {pathlist.Count} directories on the PATH");
+      Assert.True(pathlist.Count > 4);
+      im.SetAsList("PATH", InvocationModel.DefaultListSeparator, pathlist);
+      var path2 = im.Variables["PATH"];
+      Assert.Equal(path, path2);
+
+      // serialize the model to a file for inspection
+      var json = JsonConvert.SerializeObject(im, Formatting.Indented);
+      var dumpname = "model-dump-1.json";
+      _output.WriteLine($"Saving '{dumpname}'");
+      File.WriteAllText(dumpname, json);
+    }
+
+    [Fact]
+    public void CanBuildInvocationModel()
+    {
+
+      var defname = "test-single";
+      var cwd = Environment.CurrentDirectory;
+      var store = new AppdefStore(cwd, null);
+      var chain = store.LoadAppdef(defname);
+      var im = InvocationModel.CreateDefault(null);
+
+      // serialize the pre-mutate model to a file for inspection
+      var json = JsonConvert.SerializeObject(im, Formatting.Indented);
+      var dumpname = "model-dump-2-pre-mutate.json";
+      _output.WriteLine($"Saving '{dumpname}'");
+      File.WriteAllText(dumpname, json);
+
+      Assert.Null(im.Executable);
+      Assert.DoesNotContain("-hide_banner", im.Arguments);
+      Assert.DoesNotContain("FFMPEGPATH", im.Variables);
+      
+      chain.ApplyTo(im);
+
+      // serialize the post-mutate model to a file for inspection
+      json = JsonConvert.SerializeObject(im, Formatting.Indented);
+      var dumpname2 = "model-dump-2-post-mutate.json";
+      _output.WriteLine($"Saving '{dumpname2}'");
+      File.WriteAllText(dumpname2, json);
+
+      Assert.NotNull(im.Executable);
+      Assert.Contains("-hide_banner", im.Arguments);
+      Assert.Contains("FFMPEGPATH", im.Variables);
+    }
+
     private static T TagAsNotNull<T>(T? t)
       where T : class
     {

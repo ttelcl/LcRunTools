@@ -124,9 +124,10 @@ namespace Lcl.RunLib.ApplicationDefinitions
       {
         model.PrependCommandPath = PrependCommandPath.Value;
       }
-
-      // Processing a list variable may change an existing plain variable into a list variable
-      // The reverse is not true. However, plain variables are processed first.
+      if(!String.IsNullOrEmpty(WorkDir))
+      {
+        model.WorkingDirectory = WorkDir;
+      }
 
       foreach(var plainKvp in FullVariableMutations)
       {
