@@ -44,6 +44,11 @@
     ],
     "prepend-command-path": false,
 
+    "#comment-workdir": [
+      "The initial work directory, or null or omitted to not change it."
+    ],
+    "workdir": null,
+
     "#comments-vars": [
       "The 'vars' subsection in 'tobase' or 'frombase' describes edits to plain",
       "environment variables (not list-valued environment variables).",

@@ -27,17 +27,17 @@ namespace Lcl.RunLib.ApplicationDefinitions
       string? command = null,
       [JsonProperty("prepend-command-path")]
       bool? prependCommandPath = null,
-      [JsonProperty("vars")]
-      Dictionary<string, string?>? plainVariables = null,
-      [JsonProperty("lists")]
-      Dictionary<string, ListVarMutation>? listVariables = null,
+      string? workdir = null,
+      Dictionary<string, string?>? vars = null,
+      Dictionary<string, ListVarMutation>? lists = null,
       ListMutation? args = null)
     {
       Command = command;
       PrependCommandPath = prependCommandPath;
-      PlainVariableMutations = plainVariables ?? new Dictionary<string, string?>();
-      ListVariableMutations = listVariables ?? new Dictionary<string, ListVarMutation>();
+      FullVariableMutations = vars ?? new Dictionary<string, string?>();
+      ListVariableMutations = lists ?? new Dictionary<string, ListVarMutation>();
       ArgumentListMutations = args ?? new ListMutation();
+      WorkDir = workdir;
     }
 
     /// <summary>
@@ -54,13 +54,19 @@ namespace Lcl.RunLib.ApplicationDefinitions
     public bool? PrependCommandPath { get; }
 
     /// <summary>
-    /// Mutations to plain (non-list) variables
+    /// The working directory, or null to not mutate it
     /// </summary>
-    [JsonProperty("vars")]
-    public IReadOnlyDictionary<string, string?> PlainVariableMutations { get; }
+    [JsonProperty("workdir", DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public string? WorkDir { get; }
 
     /// <summary>
-    /// Mutations to list-valued variables
+    /// Mutations to full variables
+    /// </summary>
+    [JsonProperty("vars")]
+    public IReadOnlyDictionary<string, string?> FullVariableMutations { get; }
+
+    /// <summary>
+    /// Mutations variables that are treaated as list-valued
     /// </summary>
     [JsonProperty("lists")]
     public IReadOnlyDictionary<string, ListVarMutation> ListVariableMutations { get; }
@@ -75,9 +81,9 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// Tell the JSON serializer whether or not to serialize the
     /// plain variable mutation map
     /// </summary>
-    public bool ShouldSerializePlainVariableMutations()
+    public bool ShouldSerializeFullVariableMutations()
     {
-      return PlainVariableMutations.Count > 0;
+      return FullVariableMutations.Count > 0;
     }
 
     /// <summary>
@@ -122,7 +128,7 @@ namespace Lcl.RunLib.ApplicationDefinitions
       // Processing a list variable may change an existing plain variable into a list variable
       // The reverse is not true. However, plain variables are processed first.
 
-      foreach(var plainKvp in PlainVariableMutations)
+      foreach(var plainKvp in FullVariableMutations)
       {
         var varName = plainKvp.Key;
         var varValue = plainKvp.Value;

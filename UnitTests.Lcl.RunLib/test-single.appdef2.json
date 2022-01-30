@@ -18,6 +18,8 @@
 
     "prepend-command-path": false,
 
+    "workdir":  null,
+
     "vars": {
       "FFMPEGPATH": "c:\\bin\\ffmpeg\\bin"
     },
