@@ -1,0 +1,50 @@
+﻿{
+  "base": null,
+  "tobase": {
+    "vars": {
+      "del1": null,
+      "del2": "not-yet-deleted",
+      "var1": "var1-base-tobase",
+      "var2": "var2-base-tobase",
+      "var3": "var3-base-tobase"
+    },
+    "lists": {
+      "list1": {
+        "sep": ",",
+        "prepend": [
+          "l1-base-to-pre"
+        ],
+        "append": [
+          "l1-base-to-app"
+        ]
+      },
+      "list2": {
+        "sep": ",",
+        "prepend": [
+          "l2-base-to-pre1",
+          "l2-base-to-pre2"
+        ]
+      }
+    }
+  },
+  "frombase": {
+    "command": "c:\\Windows\\notepad.exe",
+    "vars": {
+      "del2": null,
+      "var2": "var2-base-frombase",
+      "var4": "var4-base-frombase"
+    },
+    "lists": {
+      "list1": {
+        "sep": ",",
+        "prepend": [
+          "l1-base-from-pre"
+        ],
+        "append": [
+          "l1-base-from-app"
+        ]
+      }
+    }
+  }
+
+}

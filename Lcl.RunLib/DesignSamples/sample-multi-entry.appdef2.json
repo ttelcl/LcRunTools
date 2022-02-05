@@ -1,0 +1,39 @@
+﻿{
+  "base": "test-multi-base",
+  "tobase": {
+    "vars": {
+      "del1": "del1-entry-tobase",
+      "var2": "var2-entry-tobase",
+      "var3": "var3-entry-tobase"
+    },
+    "lists": {
+      "list1": {
+        "sep": ",",
+        "prepend": [
+          "l1-entry-to-pre"
+        ],
+        "append": [
+          "l1-entry-to-app"
+        ]
+      }
+    }
+  },
+  "frombase": {
+    "vars": {
+      "del2": "undel-entry-frombase",
+      "var2": "var2-entry-frombase",
+      "var5": "var5-entry-frombase"
+    },
+    "lists": {
+      "list1": {
+        "sep": ",",
+        "prepend": [
+          "l1-entry-from-pre"
+        ],
+        "append": [
+          "l1-entry-from-app"
+        ]
+      }
+    }
+  }
+}

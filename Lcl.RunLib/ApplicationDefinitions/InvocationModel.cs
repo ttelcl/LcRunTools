@@ -167,6 +167,23 @@ namespace Lcl.RunLib.ApplicationDefinitions
     }
 
     /// <summary>
+    /// Find a variable, returning the value if found and null if not found.
+    /// Note that a return value null can mean the variable is missing or that its
+    /// value is actually null!
+    /// </summary>
+    public string? FindVar(string varname)
+    {
+      if(_variables.TryGetValue(varname, out var value))
+      {
+        return value;
+      }
+      else
+      {
+        return null;
+      }
+    }
+
+    /// <summary>
     /// Set an environment variable to a value constructed from a list using the
     /// specified separator
     /// </summary>
@@ -243,8 +260,9 @@ namespace Lcl.RunLib.ApplicationDefinitions
         }
         var pathlist = GetAsList("PATH", DefaultListSeparator);
         pathlist.Insert(0, cmdpath);
+        SetAsList("PATH", DefaultListSeparator, pathlist);
+        PrependCommandPath = false;
       }
-      var listNames = ListSeparators.Keys.ToList();
     }
 
 

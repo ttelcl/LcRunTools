@@ -166,6 +166,61 @@ namespace UnitTests.Lcl.RunLib
       Assert.Contains("FFMPEGPATH", im.Variables);
     }
 
+    [Fact]
+    public void CanBuildInvocationModel2()
+    {
+
+      var defname = "test-multi-entry";
+      var cwd = Environment.CurrentDirectory;
+      var store = new AppdefStore(cwd, null);
+      var chain = store.LoadAppdef(defname);
+      var im = InvocationModel.CreateDefault(null);
+
+      // serialize the pre-mutate model to a file for inspection
+      var json = JsonConvert.SerializeObject(im, Formatting.Indented);
+      var dumpname = "model-dump-multi-pre-mutate.json";
+      _output.WriteLine($"Saving '{dumpname}'");
+      File.WriteAllText(dumpname, json);
+
+      Assert.Null(im.Executable);
+
+      chain.ApplyTo(im);
+
+      // serialize the post-mutate model to a file for inspection
+      json = JsonConvert.SerializeObject(im, Formatting.Indented);
+      var dumpname2 = "model-dump-multi-post-mutate.json";
+      _output.WriteLine($"Saving '{dumpname2}'");
+      File.WriteAllText(dumpname2, json);
+
+      Assert.NotNull(im.Executable);
+      Assert.True(im.PrependCommandPath);
+      Assert.Contains("var1", im.Variables);
+      Assert.Equal("var1-base-tobase", im.Variables["var1"]);
+      Assert.Equal("var2-entry-frombase", im.FindVar("var2"));
+      Assert.Equal("var3-base-tobase", im.FindVar("var3"));
+      Assert.Equal("var4-base-frombase", im.FindVar("var4"));
+      Assert.Equal("var5-entry-frombase", im.FindVar("var5"));
+      Assert.Contains("del1", im.Variables); // explicit null
+      Assert.Null(im.FindVar("del1"));
+      Assert.Equal("undel-entry-frombase", im.FindVar("del2"));
+      Assert.DoesNotContain("does-not-exist", im.Variables);
+      Assert.Null(im.FindVar("does-not-exist"));
+      Assert.Equal(
+        "l1-entry-from-pre,l1-base-from-pre,l1-base-to-pre,l1-entry-to-pre,"+
+        "l1-entry-to-app,l1-base-to-app,l1-base-from-app,l1-entry-from-app",
+        im.FindVar("list1"));
+      Assert.Equal("l2-base-to-pre1,l2-base-to-pre2", im.FindVar("list2"));
+      var path = im.FindVar("PATH");
+      Assert.NotNull(path);
+      Assert.False(path!.StartsWith("c:\\Windows"));
+
+      im.Finish();
+      Assert.False(im.PrependCommandPath);
+      path = im.FindVar("PATH");
+      Assert.NotNull(path);
+      Assert.StartsWith("c:\\Windows", path!);
+    }
+
     private static T TagAsNotNull<T>(T? t)
       where T : class
     {
