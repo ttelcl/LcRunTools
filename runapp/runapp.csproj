@@ -8,4 +8,8 @@
     <RootNamespace>Lcl.RunApp</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Lcl.RunLib\Lcl.RunLib.csproj" />
+  </ItemGroup>
+
 </Project>

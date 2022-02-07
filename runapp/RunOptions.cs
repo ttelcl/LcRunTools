@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Lcl.RunLib.ApplicationDefinitions;
+
 namespace Lcl.RunApp
 {
   /// <summary>
@@ -26,6 +28,7 @@ namespace Lcl.RunApp
     {
       Action = "run";
       TargetArgs = new List<string>();
+      StoreKind = StoreLocation.User;
     }
 
     public void Initialize(IEnumerable<string> args)
@@ -48,7 +51,19 @@ namespace Lcl.RunApp
             break;
           case "-dry":
             RunDry = true;
+            Verbose = true;
             break;
+          case "-cwd":
+            StoreKind = StoreLocation.Local;
+            break;
+          case "-sys":
+            StoreKind = StoreLocation.System;
+            break;
+          case "-user":
+          case "-usr":
+            StoreKind = StoreLocation.User;
+            break;
+
           case "-l":
           case "-list":
             Action = "list";
@@ -61,6 +76,7 @@ namespace Lcl.RunApp
           case "-help":
             Action = "help";
             break;
+
           default:
             throw new InvalidOperationException(
               $"Unrecognized flag or command '{flag}'");
@@ -102,8 +118,14 @@ namespace Lcl.RunApp
     public bool Verbose { get; set; }
 
     /// <summary>
-    /// When true
+    /// When true, prepare but don't actually execute the child process
     /// </summary>
     public bool RunDry { get; set; }
+
+    /// <summary>
+    /// The appdef store to use
+    /// </summary>
+    public StoreLocation StoreKind { get; set; }
+
   }
 }

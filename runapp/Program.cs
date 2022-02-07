@@ -6,9 +6,52 @@ namespace Lcl.RunApp // Note: actual namespace depends on the project name.
   {
     static RunOptions _options = new RunOptions();
 
+    static void Yellow(string text)
+    {
+      Console.ForegroundColor = ConsoleColor.Yellow;
+      Console.WriteLine(text);
+      Console.ResetColor();
+    }
+
+    static void Gray(string text)
+    {
+      Console.WriteLine(text);
+    }
+
+    static void GreenGray(string text1, string text2)
+    {
+      Console.ForegroundColor = ConsoleColor.Green;
+      Console.Write("{0,-12}", text1);
+      Console.ResetColor();
+      Console.WriteLine(text2);
+    }
+
     static int ShowHelp(RunOptions o)
     {
-      Console.WriteLine("(TBD: show help message)");
+      Yellow(   "apprun [-v] [-dry] [-cwd|-sys|-usr] <apptag> {arguments}");
+      Gray(     "  Runs the application identified by <apptag> with the given arguments");
+      GreenGray("  -v", "Verbose mode");
+      GreenGray("  -dry", "(implies -v). Prepare but do not actually run");
+      GreenGray("  -cwd", "Also look in current directory for appdefs (for testing & debugging)");
+      GreenGray("  -sys", "Only look in the system-wide appdef directory");
+      GreenGray("  -usr", "(default) Look in the user and system-wide appdef directories");
+
+      Gray("");
+      Yellow(   "apprun [-v] [-l|-list]");
+      Gray(     "  List registered applications");
+
+      Gray("");
+      Yellow(   "apprun [-r|-register] [-x <executable.exe>] [-F]");
+      Gray(     "  Create a new appdef file for the given executable. For more advanced");
+      Gray(     "  uses you probably need to edit it before use.");
+      GreenGray("  -F", "Enables overwriting an existing appdef");
+
+      return 0;
+    }
+
+    static int CmdList(RunOptions o)
+    {
+
       return 0;
     }
     

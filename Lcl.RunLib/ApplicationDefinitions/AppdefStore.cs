@@ -13,6 +13,28 @@ using System.Threading.Tasks;
 namespace Lcl.RunLib.ApplicationDefinitions
 {
   /// <summary>
+  /// Abstract identifiers for standard AppdefStore setups
+  /// </summary>
+  public enum StoreLocation
+  {
+    /// <summary>
+    /// An AppdefStore including just the system folder
+    /// </summary>
+    System,
+
+    /// <summary>
+    /// An AppdefStore using the user folder, with the system folder as fallback
+    /// </summary>
+    User,
+
+    /// <summary>
+    /// An AppdefStore using the current working directory, with the user folder
+    /// as fallback, and the system folder as further fallback
+    /// </summary>
+    Local,
+  }
+
+  /// <summary>
   /// A logical storage for application definition files. Implemented
   /// as a specialized view on a folder
   /// </summary>
@@ -42,6 +64,30 @@ namespace Lcl.RunLib.ApplicationDefinitions
     public AppdefStore? Parent { get; }
 
     /// <summary>
+    /// The file extension for appdef files
+    /// </summary>
+    public const string AppdefExtension = ".appdef2.json";
+
+    /// <summary>
+    /// Retrieve the default store instance identified by the location code
+    /// </summary>
+    public static AppdefStore DefaultStore(StoreLocation location)
+    {
+      switch(location)
+      {
+        case StoreLocation.System:
+          return AppdefStore.DefaultSystemStore;
+        case StoreLocation.User:
+          return AppdefStore.DefaultUserStore;
+        case StoreLocation.Local:
+          return AppdefStore.DefaultLocalStore;
+        default:
+          throw new ArgumentOutOfRangeException(
+            nameof(location), "Unrecognized appdef store identifier");
+      }
+    }
+
+    /// <summary>
     /// The AppdefStore exposing the system wide application definitions
     /// </summary>
     public static AppdefStore DefaultSystemStore { get; } = new AppdefStore(SystemStoreFolder, null);
@@ -51,6 +97,12 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// (using the system store as parent)
     /// </summary>
     public static AppdefStore DefaultUserStore { get; } = new AppdefStore(UserStoreFolder, DefaultSystemStore);
+
+    /// <summary>
+    /// The AppDefStore exposing application definitions in the current directory
+    /// (using the user store as parent)
+    /// </summary>
+    public static AppdefStore DefaultLocalStore { get; } = new AppdefStore(Environment.CurrentDirectory, DefaultUserStore);
 
     /// <summary>
     /// Get the name of the folder for the current user's application definitions.
@@ -126,7 +178,7 @@ namespace Lcl.RunLib.ApplicationDefinitions
         throw new ArgumentOutOfRangeException(nameof(tag),
           "Application tag must not contain path separator characters");
       }
-      var fullname = Path.Combine(Folder, tag + ".appdef2.json");
+      var fullname = Path.Combine(Folder, tag + AppdefExtension);
       return fullname;
     }
 
@@ -144,8 +196,8 @@ namespace Lcl.RunLib.ApplicationDefinitions
         {
           var tag = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(file.Name));
           if(!String.IsNullOrEmpty(tag))
-            // Otherwise a DoS could be done by triggering the case where GetFileNameWithoutExtension
-            // returns null
+          // Otherwise a DoS could be done by triggering the case where GetFileNameWithoutExtension
+          // returns null
           {
             yield return tag;
           }
@@ -174,6 +226,24 @@ namespace Lcl.RunLib.ApplicationDefinitions
     {
       var checkSet = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
       return LoadAppdefNode(tag, checkSet);
+    }
+
+    /// <summary>
+    /// Enumerate the apptags for the application definitions locally in this store
+    /// (does not recurse into parents)
+    /// </summary>
+    public IEnumerable<string> Apptags()
+    {
+      var di = new DirectoryInfo(Folder);
+      if(di.Exists)
+      {
+        foreach(var fi in di.GetFiles("*"+AppdefExtension))
+        {
+          var name = fi.Name;
+          var tag = name[..^AppdefExtension.Length];
+          yield return tag;
+        }
+      }
     }
 
     private InvocationMutationNode LoadAppdefNode(string tag, HashSet<string> checkSet)
