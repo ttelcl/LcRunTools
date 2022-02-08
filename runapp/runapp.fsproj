@@ -15,7 +15,9 @@
     <Compile Include="PrintUtils.fs" />
     <Compile Include="ExceptionTool.fs" />
     <Compile Include="Usage.fs" />
+    <Compile Include="FsRunUtils.fs" />
     <Compile Include="SharedArguments.fs" />
+    <Compile Include="CmdList.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

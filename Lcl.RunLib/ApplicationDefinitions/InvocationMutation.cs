@@ -28,12 +28,22 @@ namespace Lcl.RunLib.ApplicationDefinitions
       [JsonProperty("tobase")]
       InvocationMutationPhase toBase,
       [JsonProperty("frombase")]
-      InvocationMutationPhase fromBase
+      InvocationMutationPhase fromBase,
+      string? description = null
       )
     {
       BaseName = baseName;
       ToBasePhase = toBase;
       FromBasePhase = fromBase;
+      Description = description;
+      if(toBase == null)
+      {
+        throw new ArgumentNullException(nameof(toBase), "'toBase' section missing");
+      }
+      if(fromBase == null)
+      {
+        throw new ArgumentNullException(nameof(fromBase), "'fromBase' section missing");
+      }
     }
 
     /// <summary>
@@ -85,7 +95,22 @@ namespace Lcl.RunLib.ApplicationDefinitions
     [JsonProperty("frombase")]
     public InvocationMutationPhase FromBasePhase { get; }
 
+    /// <summary>
+    /// The (optional) brief description.
+    /// </summary>
+    [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public string? Description { get; }
 
+    /// <summary>
+    /// Return the command defined in this instance (in frombase or tobase phase),
+    /// if any. Not serialized here.
+    /// </summary>
+    [JsonIgnore]
+    public string? Command {
+      get {
+        return FromBasePhase.Command ?? ToBasePhase.Command;
+      }
+    }
 
   }
 }

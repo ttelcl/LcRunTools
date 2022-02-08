@@ -36,7 +36,7 @@ namespace UnitTests.Lcl.RunLib
       var cwd = Environment.CurrentDirectory;
       _output.WriteLine($"CWD = {cwd}");
       
-      var store = new AppdefStore(cwd, null);
+      var store = new AppdefStore(cwd, "test-local", null);
       var fnm = store.FindAppdefFile(defname);
       Assert.NotNull(fnm);
       fnm = TagAsNotNull(fnm);
@@ -55,7 +55,7 @@ namespace UnitTests.Lcl.RunLib
     {
       var defname = "test-single";
       var cwd = Environment.CurrentDirectory;
-      var store = new AppdefStore(cwd, null);
+      var store = new AppdefStore(cwd, "test-local", null);
       var fnm = store.FindAppdefFile(defname);
       Assert.NotNull(fnm);
       fnm = TagAsNotNull(fnm);
@@ -99,7 +99,7 @@ namespace UnitTests.Lcl.RunLib
     {
       var defname = "test-single";
       var cwd = Environment.CurrentDirectory;
-      var store = new AppdefStore(cwd, null);
+      var store = new AppdefStore(cwd, "test-local", null);
 
       var chain = store.LoadAppdef(defname);
       Assert.NotNull(chain);
@@ -139,7 +139,7 @@ namespace UnitTests.Lcl.RunLib
 
       var defname = "test-single";
       var cwd = Environment.CurrentDirectory;
-      var store = new AppdefStore(cwd, null);
+      var store = new AppdefStore(cwd, "test-local", null);
       var chain = store.LoadAppdef(defname);
       var im = InvocationModel.CreateDefault(null);
 
@@ -172,7 +172,7 @@ namespace UnitTests.Lcl.RunLib
 
       var defname = "test-multi-entry";
       var cwd = Environment.CurrentDirectory;
-      var store = new AppdefStore(cwd, null);
+      var store = new AppdefStore(cwd, "test-local", null);
       var chain = store.LoadAppdef(defname);
       var im = InvocationModel.CreateDefault(null);
 

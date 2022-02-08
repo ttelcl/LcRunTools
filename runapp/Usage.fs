@@ -15,11 +15,15 @@ let usage() =
   p2 "-usr         (default) Include user and system appdef search paths"
   p2 "-sys         Only search appdefs in the system search folder"
   pn ""
-  py "runapp -l"
-  py "runapp -list"
+  py "runapp [-v] [-cwd|-usr|-sys] /list [-q|-b|-v]"
+  py "runapp /l <arguments>"
   pn "  List the registered applications"
+  p2 "-q           Quiet mode: only list names. Does not check for appdef JSON errors."
+  p2 "-b           (default) Brief mode: list names, base and command"
+  p2 "-v           Verbose mode: additionaly list description"
   pn ""
-  py "runapp -r <arguments>"
+  py "runapp [-v] [-cwd|-usr|-sys] /register <arguments>"
+  py "runapp /r <arguments>"
   pn "  Create a new appdef file (syntax TBD)"
 
 

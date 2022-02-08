@@ -42,14 +42,16 @@ let preparse args =
       rest |> preparsemore {o with AppdefLocation = StoreLocation.System}
     | [] ->
       failwith "No command given (an apptag, or -l or -r option)"
-    | "-l" :: rest
-    | "-list" :: rest ->
+    | "/l" :: rest
+    | "/list" :: rest ->
       o, ApprunCommand.List, rest
-    | "-r" :: rest
-    | "-register" :: rest ->
+    | "/r" :: rest
+    | "/register" :: rest ->
       o, ApprunCommand.Register, rest
-    | apptag :: rest when not(apptag.StartsWith('-')) ->
+    | apptag :: rest when not(apptag.StartsWith('-') || apptag.StartsWith('/')) ->
       o, ApprunCommand.Run(apptag), rest
+    | x :: _ when x.StartsWith('/') ->
+      failwithf "Unrecognized command: %s" x
     | x :: _ ->
       failwithf "Unrecognized pre-command option: %s" x
   args |> preparsemore {

@@ -46,10 +46,12 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// </summary>
     public AppdefStore(
       string folder,
+      string label,
       AppdefStore? parent = null)
     {
       Folder = Path.GetFullPath(folder);
       Parent = parent;
+      Label = label;
     }
 
     /// <summary>
@@ -57,6 +59,16 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// non-existent
     /// </summary>
     public string Folder { get; }
+
+    /// <summary>
+    /// True if the folder exists
+    /// </summary>
+    public bool Exists { get => Directory.Exists(Folder); }
+
+    /// <summary>
+    /// A label to identify this particular store
+    /// </summary>
+    public string Label { get; }
 
     /// <summary>
     /// The parent store, if any
@@ -90,19 +102,22 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// <summary>
     /// The AppdefStore exposing the system wide application definitions
     /// </summary>
-    public static AppdefStore DefaultSystemStore { get; } = new AppdefStore(SystemStoreFolder, null);
+    public static AppdefStore DefaultSystemStore { get; }
+      = new AppdefStore(SystemStoreFolder, "system", null);
 
     /// <summary>
     /// The AppdefStore exposing the current user's application definitions 
     /// (using the system store as parent)
     /// </summary>
-    public static AppdefStore DefaultUserStore { get; } = new AppdefStore(UserStoreFolder, DefaultSystemStore);
+    public static AppdefStore DefaultUserStore { get; }
+      = new AppdefStore(UserStoreFolder, "user", DefaultSystemStore);
 
     /// <summary>
     /// The AppDefStore exposing application definitions in the current directory
     /// (using the user store as parent)
     /// </summary>
-    public static AppdefStore DefaultLocalStore { get; } = new AppdefStore(Environment.CurrentDirectory, DefaultUserStore);
+    public static AppdefStore DefaultLocalStore { get; }
+      = new AppdefStore(Environment.CurrentDirectory, "local", DefaultUserStore);
 
     /// <summary>
     /// Get the name of the folder for the current user's application definitions.
@@ -110,7 +125,9 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// </summary>
     public static string UserStoreFolder {
       get {
-        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RunAppdefs");
+        var folder = Path.Combine(
+          Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+          ".appdefs2");
         return folder;
       }
     }
@@ -121,7 +138,9 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// </summary>
     public static string SystemStoreFolder {
       get {
-        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RunAppdefs");
+        var folder = Path.Combine(Environment.GetFolderPath(
+          Environment.SpecialFolder.CommonApplicationData),
+          ".appdefs2");
         return folder;
       }
     }
@@ -226,6 +245,24 @@ namespace Lcl.RunLib.ApplicationDefinitions
     {
       var checkSet = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
       return LoadAppdefNode(tag, checkSet);
+    }
+
+    /// <summary>
+    /// Load the indicated bare application definition from this store.
+    /// Fails if there is no such appdef in this store.
+    /// Does not use the search path, only checks this store itself.
+    /// </summary>
+    public InvocationMutation LoadAppdefBare(string tag)
+    {
+      var file = AppdefFileName(tag);
+      if(!File.Exists(file))
+      {
+        throw new InvalidOperationException(
+          $"Appdef file not found: {file}");
+      }
+      var json = File.ReadAllText(file);
+      var im = InvocationMutation.FromJson(json);
+      return im;
     }
 
     /// <summary>

@@ -12,7 +12,7 @@ let run arglist =
   let so, cmd, restargs = arglist |> preparse
   match cmd with
   | ApprunCommand.List ->
-    failwith "Not yet implemented: list"
+    restargs |> CmdList.runCmdlist so
   | ApprunCommand.Run(target) ->
     failwithf "Not yet implemented: run (%s)" target
   | ApprunCommand.Register ->
