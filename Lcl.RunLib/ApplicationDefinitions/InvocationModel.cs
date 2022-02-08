@@ -250,6 +250,11 @@ namespace Lcl.RunLib.ApplicationDefinitions
         throw new InvalidOperationException(
           $"The command path must be fully specified");
       }
+      if(!File.Exists(Executable))
+      {
+        throw new InvalidOperationException(
+          $"The command file does not exist: {Executable}");
+      }
       if(PrependCommandPath)
       {
         var cmdpath = Path.GetDirectoryName(Executable);
@@ -263,6 +268,40 @@ namespace Lcl.RunLib.ApplicationDefinitions
         SetAsList("PATH", DefaultListSeparator, pathlist);
         PrependCommandPath = false;
       }
+    }
+
+    /// <summary>
+    /// Calls Finish() and returns a new ProcessStartInfo object matching
+    /// this InvocationModel
+    /// </summary>
+    public ProcessStartInfo Build()
+    {
+      Finish();
+      var psi = new ProcessStartInfo(Executable!);
+      psi.UseShellExecute = false;
+      psi.FileName = Executable;
+      psi.WorkingDirectory = WorkingDirectory;
+      var args = psi.ArgumentList;
+      foreach(var arg in Arguments)
+      {
+        args.Add(arg);
+      }
+      var env = psi.Environment;
+      foreach(var kvp in Variables)
+      {
+        if(kvp.Value == null)
+        {
+          if(env.ContainsKey(kvp.Key))
+          {
+            env.Remove(kvp.Key);
+          }
+        }
+        else
+        {
+          env[kvp.Key] = kvp.Value;
+        }
+      }
+      return psi;
     }
 
 

@@ -18,6 +18,7 @@ type ApprunCommand =
 
 type SharedOptions = {
   DryRun: bool
+  DoDump: bool
   AppdefLocation: StoreLocation
 }
 
@@ -31,6 +32,8 @@ let preparse args =
       rest |> preparsemore o
     | "-dry" :: rest ->
       rest |> preparsemore {o with DryRun = true}
+    | "-dmp" :: rest ->
+      rest |> preparsemore {o with DoDump = true}
     | "-cwd" :: rest
     | "-local" :: rest ->
       rest |> preparsemore {o with AppdefLocation = StoreLocation.Local}
@@ -57,5 +60,6 @@ let preparse args =
   args |> preparsemore {
     DryRun = false
     AppdefLocation = StoreLocation.User
+    DoDump = false
   }
 

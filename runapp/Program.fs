@@ -2,6 +2,7 @@
 
 open System
 open System.IO
+open System.Text
 
 open CommonTools
 open ExceptionTool
@@ -14,13 +15,17 @@ let run arglist =
   | ApprunCommand.List ->
     restargs |> CmdList.runCmdlist so
   | ApprunCommand.Run(target) ->
-    failwithf "Not yet implemented: run (%s)" target
+    restargs |> CmdRun.runRun so target
   | ApprunCommand.Register ->
     failwith "Not yet implemented: register"
 
 [<EntryPoint>]
 let main args =
   try
+    // https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process?view=net-6.0#net-core-notes
+    let provider = CodePagesEncodingProvider.Instance;
+    Encoding.RegisterProvider(provider);
+    
     match args.Length with
     | 0 ->
       usage()

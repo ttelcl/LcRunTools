@@ -16,13 +16,19 @@ let color2 fclr bclr =
 let resetColor () =
   Console.ResetColor()
 
+// Note the modification compared to the usual version: background color
+// and use of stderr instead of stdout
 let startFile name =
   let tmp = name + ".tmp"
-  printf "Writing '"
+  bcolor Color.DarkBlue
+  color Color.Gray // expected to be the normal text color, but be explicit just to be sure
+  eprintf "Writing '"
   color Color.DarkYellow
-  printf "%s" name
+  eprintf "%s" name
+  color Color.Gray
+  eprintf "'"
   resetColor()
-  printfn "'"
+  eprintfn ""
   File.CreateText(tmp)
 
 let finishFile name =

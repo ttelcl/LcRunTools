@@ -9,70 +9,70 @@ open CommonTools
 let rec fancyExceptionPrint showTrace (ex:Exception) =
   try
     color Color.Red
-    printf "%s" (ex.GetType().FullName)
+    eprintf "%s" (ex.GetType().FullName)
     resetColor()
-    printf ": "
+    eprintf ": "
     color Color.DarkYellow
-    printf "%s" ex.Message
+    eprintf "%s" ex.Message
     resetColor()
-    printfn ""
+    eprintfn ""
     if showTrace then
       let trace = new StackTrace(ex, true)
       for frame in trace.GetFrames() do
-        printf "  "
+        eprintf "  "
         let fnm =
           if frame.HasSource() then
             let fnm = frame.GetFileName()
             color Color.Red
-            printf "%15s" (Path.GetFileName(fnm))
+            eprintf "%15s" (Path.GetFileName(fnm))
             resetColor()
-            printf ":"
+            eprintf ":"
             color Color.Green
-            printf "%4d" (frame.GetFileLineNumber())
+            eprintf "%4d" (frame.GetFileLineNumber())
             resetColor()
             fnm
           else
             color Color.Red
-            printf "%15s" "?"
+            eprintf "%15s" "?"
             resetColor()
-            printf ":"
-            printf "    "
+            eprintf ":"
+            eprintf "    "
             resetColor()
             null
         if frame.HasMethod() then
           let method = frame.GetMethod()
-          printf " "
+          eprintf " "
           color Color.Yellow
-          printf "%s" (method.Name)
-          printf "("
+          eprintf "%s" (method.Name)
+          eprintf "("
           let pinfs = method.GetParameters()
           if pinfs.Length>0 then
             color Color.DarkYellow
-            printf "[%d]" pinfs.Length
+            eprintf "[%d]" pinfs.Length
             color Color.Yellow
-            printf ")"
+            eprintf ")"
           else
-            printf ")"
+            eprintf ")"
           color Color.DarkGray
-          printf " "
+          eprintf " "
           color Color.White
-          printf "%s" (method.ReflectedType.Name)
+          eprintf "%s" (method.ReflectedType.Name)
           resetColor()
         else
           color Color.Red
-          printf "(?)"
+          eprintf "(?)"
           resetColor()
         if fnm <> null then
           color Color.DarkGray
-          printf " (%s)" (Path.GetDirectoryName(fnm))
+          eprintf " (%s)" (Path.GetDirectoryName(fnm))
           resetColor()
-        printfn ""
+        eprintfn ""
       ()
     finally
       resetColor()
   if ex.InnerException <> null then
     color Color.Cyan
-    printf "----> "
+    eprintf "----> "
     resetColor()
     ex.InnerException |> fancyExceptionPrint showTrace
 
