@@ -8,6 +8,7 @@
   <PropertyGroup>
     <!-- This prevents other language resources being emitted -->
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,7 @@
     <Compile Include="SharedArguments.fs" />
     <Compile Include="CmdList.fs" />
     <Compile Include="CmdRun.fs" />
+    <Compile Include="CmdRegister.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

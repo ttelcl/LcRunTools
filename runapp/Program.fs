@@ -17,7 +17,7 @@ let run arglist =
   | ApprunCommand.Run(target) ->
     restargs |> CmdRun.runRun so target
   | ApprunCommand.Register ->
-    failwith "Not yet implemented: register"
+    restargs |> CmdRegister.runRegister so
 
 [<EntryPoint>]
 let main args =

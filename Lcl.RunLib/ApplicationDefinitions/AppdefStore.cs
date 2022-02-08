@@ -149,6 +149,26 @@ namespace Lcl.RunLib.ApplicationDefinitions
       }
     }
 
+    private static char[] __badChars = "\\/: \t\n\r\f".ToCharArray();
+    
+    /// <summary>
+    /// A simple check if the given string may be a valid apptag.
+    /// If this returns false, it definitely isn't. If it returns true
+    /// there is a good chance that it is valid (but not a strict guarantee)
+    /// </summary>
+    public static bool IsValidApptag(string apptag)
+    {
+      if(String.IsNullOrEmpty(apptag))
+      {
+        return false;
+      }
+      if(apptag.IndexOfAny(__badChars) >= 0)
+      {
+        return false;
+      }
+      return true;
+    }
+
     /// <summary>
     /// Find the full path to the application definition file indicated by the tag, or
     /// null if not found.

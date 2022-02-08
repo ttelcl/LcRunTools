@@ -29,6 +29,12 @@ namespace Lcl.RunLib.ApplicationDefinitions
       FileName = fileName;
       Tag = tag;
       Content = content;
+      if(!AppdefStore.IsValidApptag(tag))
+      {
+        throw new ArgumentException(
+          "Invalid apptag (it contains invalid characters)",
+          nameof(tag));
+      }
     }
 
     /// <summary>

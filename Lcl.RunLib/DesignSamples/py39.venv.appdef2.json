@@ -1,0 +1,36 @@
+{
+  "#comment": [
+    "This file is manually crafted",
+    "Reminder: Anaconda is picky about case. To avoid Anaconda warnings,",
+    "make sure to use a consistent casing of the conda paths.",
+    "(I got warnings triggered by sometimes using 'k:\\...' and sometimes",
+    "'K:\\...')"
+  ],
+  "description": "Python 3.9 Conda virtual environment",
+  "base": null,
+  "tobase": {},
+  "frombase": {
+    "command": "K:\\ttelcl\\anaconda3\\envs\\py39\\python.exe",
+    "vars": {
+      "CONDA_DEFAULT_ENV": "py39",
+      "CONDA_PREFIX": "K:\\ttelcl\\anaconda3\\envs\\py39",
+      "CONDA_PROMPT_MODIFIER": "(py39)",
+      "CONDA_PYTHON_EXE": "K:\\ttelcl\\anaconda3\\python.exe",
+      "CONDA_SHLVL": "1",
+      "PROMPT": "(py39) $P$G"
+    },
+    "lists": {
+      "PATH": {
+        "sep": ";",
+        "prepend": [
+          "K:\\ttelcl\\anaconda3\\envs\\py39",
+          "K:\\ttelcl\\anaconda3\\envs\\py39\\Library\\mingw-w64\\bin",
+          "K:\\ttelcl\\anaconda3\\envs\\py39\\Library\\usr\\bin",
+          "K:\\ttelcl\\anaconda3\\envs\\py39\\Library\\bin",
+          "K:\\ttelcl\\anaconda3\\envs\\py39\\Scripts",
+          "K:\\ttelcl\\anaconda3\\envs\\py39\\bin"
+        ]
+      }
+    }
+  }
+}
