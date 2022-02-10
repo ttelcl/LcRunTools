@@ -6,21 +6,21 @@ to help guide the design. It also contains some real world examples.
 
 ### Example 1: A python virtual environment
 
-The `pyenv-3-10.appdef2.json` example runs python in a 
+The `pyenv-3-10.venv.appdef2.json` example runs python in a 
 particular virtual environment. In this case it is a "normal" 
 virtual environment, not an Anaconda one.
 It can be run stand-alone to start an interactive python 
 session in this virtual environment by invoking
 
-```batch
-runapp pyenv-3-10
+```bat
+runapp pyenv-3-10.venv
 ```
 
 Or you can use it to run python scripts in this environment. 
 For example, to run pip and list the installed packages:
 
-```batch
-runapp pyenv-3-10 -m pip list
+```bat
+runapp pyenv-3-10.venv -m pip list
 ```
 
 Here is the content of this appdef:
@@ -50,6 +50,10 @@ A few observations:
 * Since this appdef has no base, it doesn't really matter if you
   use the `tobase` or the `frombase` section. By convention 
   use the `frombase` one.
+* The appdef's name is `pyenv-3-10.venv`. Note the use of a
+  pseudo-extension `.venv` to hint that this a (python) _virtual 
+  environment_ definition, and is intended to be used as base
+  appdef in other appdefs.
 
 ### Example 2: A python application
 
