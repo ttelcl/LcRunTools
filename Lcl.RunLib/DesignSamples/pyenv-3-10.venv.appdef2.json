@@ -1,0 +1,20 @@
+{
+  "#comment": [
+    "This file is manually crafted",
+    "It aims to run python using my 'pyenv-3-10' environment",
+    "(a standard, not-anaconda, virtual python environment)",
+    "It does not completely simulate the activated environment,",
+    "since there is no need to support 'deactivate' functionality"
+  ],
+  "description": "Python 3.10 Standard virtual environment",
+  "base": null,
+  "tobase": {},
+  "frombase": {
+    "command": "C:\\Users\\ttelcl\\.venv\\pyenv-3-10\\Scripts\\python.exe",
+    "vars": {
+      "VIRTUAL_ENV": "C:\\Users\\ttelcl\\.venv\\pyenv-3-10",
+      "VIRTUAL_ENV_PROMPT": "(pyenv-3-10)",
+      "PROMPT": "(pyenv-3-10) $P$G"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "description": "run PIP in the pyenv-3-10 virtual environment",
+  "base": "pyenv-3-10.venv",
+  "tobase": {},
+  "frombase": {
+    "args": {
+      "prepend": [
+        "-m",
+        "pip"
+      ]
+    }
+  }
+}
