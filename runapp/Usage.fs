@@ -31,10 +31,13 @@ let usage() =
   py "runapp <options> /register <arguments>"
   py "runapp <options> /r <arguments>"
   pn "  Create a new (stub) appdef file. Consider further tuning in a text editor."
-  p2 "-x <exe>      The (existing) executable file to register."
-  p2 "-n <name>     The apptag (name) for the new appdef (default: derived from <exe>)"
-  p2 "-base <tag>   The existing apptag for the base app (for layered appdefs)"
-  p2 "-F            Enable overwriting an existing appdef"
+  p2 "-x <exe>          The (existing) executable file to register."
+  p2 "-n <name>         The apptag (name) for the new appdef (default: derived from <exe>)"
+  p2 "-base <tag>       The existing apptag for the base app (for layered appdefs)"
+  p2 "-a <arg>          An argument to prepend (in the frombase phase). Repeatable."
+  p2 "-var <var> <val>  An environment variable to set (frombase). Repeatable"
+  p2 "-d <desc>         A description message. If omitted a stub will be generated"
+  p2 "-F                Enable overwriting an existing appdef"
 
   
 

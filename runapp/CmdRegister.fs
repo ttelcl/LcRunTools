@@ -14,12 +14,20 @@ open ExceptionTool
 open Usage
 open FsRunUtils
 
+type private VarAssign = {
+  VarName: string
+  VarValue: string
+}
+
 type private RegisterOptions = {
   Shared: SharedArguments.SharedOptions
   Executable: string
   Name: string
   BaseTag: string
   Force: bool
+  Description: string
+  VariablesFb: VarAssign list
+  ArgumentsFb: string list
 }
 
 let runRegister so args =
@@ -44,10 +52,21 @@ let runRegister so args =
     | "-F" :: rest
     | "-force" :: rest ->
       rest |> parsemore {o with Force = true}
+    | "-d" :: desc :: rest ->
+      rest |> parsemore {o with Description = desc}
+    | "-a" :: arg :: rest ->
+      rest |> parsemore {o with ArgumentsFb = arg :: o.ArgumentsFb}
+    | "-var" :: varname :: varvalue :: rest 
+    | "-set" :: varname :: varvalue :: rest ->
+      let v = {
+        VarName = varname
+        VarValue = varvalue
+      }
+      rest |> parsemore {o with VariablesFb = v :: o.VariablesFb}
     | [] ->
       if o.Executable = null && o.Name = null then
         failwith "At least one of '-n' or '-x' should be specified (to determine the appdef name)"
-      o
+      {o with ArgumentsFb = o.ArgumentsFb |> List.rev; VariablesFb = o.VariablesFb |> List.rev}
     | x :: _ ->
       x |> failwithf "Unrecognized argument: '%s'"
   let o = args |> parsemore {
@@ -56,6 +75,9 @@ let runRegister so args =
     Name = null
     BaseTag = null
     Force = false
+    Description = null
+    VariablesFb = []
+    ArgumentsFb = []
   }
   let exe =
     if o.Executable |> String.IsNullOrEmpty then
@@ -68,7 +90,7 @@ let runRegister so args =
         attempt
       else
         failwith "Not yet implemented: resolving the executable against the PATH"
-  if exe |> File.Exists |> not then
+  if exe <> null && exe |> File.Exists |> not then
     exe |> failwithf "Target executable not found: %s"
   let name =
     if o.Name |> String.IsNullOrEmpty then
@@ -105,11 +127,55 @@ let runRegister so args =
     resetColor()
     printfn "."
   let description =
-    if exe |> String.IsNullOrEmpty |> not then
+    if o.Description |> String.IsNullOrEmpty |> not then
+      o.Description
+    elif exe |> String.IsNullOrEmpty |> not then
       sprintf "(EDITME) Run %s" exe
     else
       sprintf "(EDITME) Application %s" name
+  if o.BaseTag |> String.IsNullOrEmpty |> not then
+    if o.BaseTag |> AppdefStore.IsValidApptag |> not then
+      failwithf "The given base tag is not a valid apptag: %s" o.BaseTag
+    let foundBase = store.FindAppdefFile(o.BaseTag, true)
+    if foundBase = null then
+      failwithf "Unknown base tag: %s" o.BaseTag
+  let vars = new System.Collections.Generic.Dictionary<string, string>()
+  for vdef in o.VariablesFb do
+    vars.[vdef.VarName] <- vdef.VarValue
+  let arglist =
+    new ListMutation(prepend = o.ArgumentsFb, append = null)
+  let tobase =
+    new InvocationMutationPhase() // empty!
+  let frombase =
+    new InvocationMutationPhase(
+      command = exe,
+      prependCommandPath = new Nullable<bool>(),
+      workdir = null,
+      vars = vars,
+      lists = null,
+      args = arglist
+      )
+  let im =
+    new InvocationMutation(o.BaseTag, tobase, frombase, description)
+  let json = JsonConvert.SerializeObject(im, Formatting.Indented)
 
-  failwith "NotYetImplemented"
+  color Color.Red
+  printf "DEBUG"
+  resetColor()
+  printfn ":"
+  printfn "%s" json
+
+  if store.Exists |> not then
+    printf "Creating store folder: "
+    color Color.Yellow
+    store.Folder |> printf "%s"
+    resetColor()
+    printfn "."
+    store.Folder |> Directory.CreateDirectory |> ignore
+  do
+    use txt = filename |> startFile
+    txt.WriteLine(json)
+  filename |> finishFile
+
   0
 
