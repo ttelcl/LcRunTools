@@ -3,6 +3,7 @@ module Usage
 
 open CommonTools
 open PrintUtils
+open ColorPrint
 
 let usage() =
   py "Application bootstrapper utility."
@@ -38,6 +39,8 @@ let usage() =
   p2 "-var <var> <val>  An environment variable to set (frombase). Repeatable"
   p2 "-d <desc>         A description message. If omitted a stub will be generated"
   p2 "-F                Enable overwriting an existing appdef"
+
+  cp "Hello \fggreen\f0 \foworld\f0! (\vRthis is a test\v0)"
 
   
 

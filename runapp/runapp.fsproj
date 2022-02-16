@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <Compile Include="CommonTools.fs" />
+    <Compile Include="ColorPrint.fs" />
     <Compile Include="PrintUtils.fs" />
     <Compile Include="ExceptionTool.fs" />
     <Compile Include="Usage.fs" />
