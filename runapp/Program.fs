@@ -18,6 +18,9 @@ let run arglist =
     restargs |> CmdRun.runRun so target
   | ApprunCommand.Register ->
     restargs |> CmdRegister.runRegister so
+  | ApprunCommand.Help(arg) ->
+    Usage.runHelp arg
+    0
 
 [<EntryPoint>]
 let main args =
@@ -28,7 +31,7 @@ let main args =
     
     match args.Length with
     | 0 ->
-      usage()
+      usage true
       0
     | _ ->
       args |> Array.toList |> run

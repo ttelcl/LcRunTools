@@ -3,7 +3,7 @@
 open System
 
 (*
-This module supports writing colorful text to the console by interpreting special
+This module supports writing colored text to the console by interpreting special
 "escape" sequences. For simplicity and brevity these are custom for this module,
 and not using existing standard codes.
 All escape sequences use \f or \v followed by one character to indicate a color
@@ -18,6 +18,7 @@ Here are the defined escape codes (demonstrated with \f, but \v has equivalent
 counterparts):
 
 \f0 or \v0   Reset both foreground and background colors to their defaults
+\fx or \vx   Does nothing. Helpful when aligning different lines
 
 \fK          ConsoleColor.Black (0)
 \fB          ConsoleColor.DarkBlue (1)
@@ -38,11 +39,26 @@ counterparts):
 
 *)
 
+(*
+Usage examples:
+
+cp "Hello \fggreen\f0 \foworld\f0! (\vRthis is a test\v0)"
+
+To combine string formatting and coloration use Printf.kprintf
+
+open Printf
+let num = 42
+let s = "Boo!"
+kprintf cp "The answer was \fr%d\f0. \fy%s\f0" num s
+
+*)
+
 type private TextPart =
   | Text of string
   | Foreground of ConsoleColor
   | Background of ConsoleColor
   | Reset
+  | Nop
 
 let colorValue ch =
   match ch with
@@ -68,6 +84,7 @@ let colorValue ch =
 let private colorEscape e ch =
   match ch with
   | '0' -> Reset
+  | 'x' -> Nop
   | other ->
     let clr = other |> colorValue
     match e with
@@ -83,6 +100,7 @@ let private render seglist =
     | Foreground(clr) -> Console.ForegroundColor <- clr
     | Background(clr) -> Console.BackgroundColor <- clr
     | Reset -> Console.ResetColor()
+    | Nop -> ()  // do nothing
 
 let colprintEx text =
   let keys = [| '\f'; '\v' |]
@@ -103,13 +121,19 @@ let colprintEx text =
   let segments = text |> splitMore []
   segments |> render
 
+/// Color-print a string with color escapes (no line break)
 let colprint text =
   text |> colprintEx
   Console.ResetColor()
 
+/// Color-print a line with color escapes (and a line break)
 let colprintn text =
   text |> colprint
   Console.WriteLine()
 
+/// Color-print a line with color escapes (and a line break)
 let cp = colprintn
+
+/// Color-print a string with color escapes (no line break)
+let cpx = colprint
 

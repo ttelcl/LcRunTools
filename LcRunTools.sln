@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		.hgignore = .hgignore
+		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -20,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Lcl.RunLib", "Uni
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{2D83D445-A92A-42AB-8D1F-C86314561F0B}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "runapp", "runapp\runapp.fsproj", "{2AB07FC8-B669-457C-BF45-A35B710A422C}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "runapp", "runapp\runapp.fsproj", "{2AB07FC8-B669-457C-BF45-A35B710A422C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

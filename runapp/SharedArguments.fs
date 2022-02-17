@@ -15,6 +15,7 @@ type ApprunCommand =
   | Run of string
   | List
   | Register
+  | Help of string option
 
 type SharedOptions = {
   DryRun: bool
@@ -51,6 +52,16 @@ let preparse args =
     | "/r" :: rest
     | "/register" :: rest ->
       o, ApprunCommand.Register, rest
+    | "/h" :: arg :: rest
+    | "-h" :: arg :: rest
+    | "-help" :: arg :: rest
+    | "/help" :: arg :: rest ->
+      o, ApprunCommand.Help(Some(arg)), rest
+    | "/h" :: rest
+    | "-h" :: rest
+    | "-help" :: rest
+    | "/help" :: rest ->
+      o, ApprunCommand.Help(None), rest
     | apptag :: rest when not(apptag.StartsWith('-') || apptag.StartsWith('/')) ->
       o, ApprunCommand.Run(apptag), rest
     | x :: _ when x.StartsWith('/') ->
