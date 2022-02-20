@@ -19,17 +19,18 @@ namespace Lcl.RunLib.ApplicationDefinitions
   {
     /// <summary>
     /// An AppdefStore including just the system folder
+    /// DEPRECATED
     /// </summary>
     System,
 
     /// <summary>
-    /// An AppdefStore using the user folder, with the system folder as fallback
+    /// An AppdefStore using the user folder
     /// </summary>
     User,
 
     /// <summary>
     /// An AppdefStore using the current working directory, with the user folder
-    /// as fallback, and the system folder as further fallback
+    /// as fallback
     /// </summary>
     Local,
   }
@@ -47,11 +48,13 @@ namespace Lcl.RunLib.ApplicationDefinitions
     public AppdefStore(
       string folder,
       string label,
+      bool quiet = false,
       AppdefStore? parent = null)
     {
       Folder = Path.GetFullPath(folder);
       Parent = parent;
       Label = label;
+      Quiet = quiet;
     }
 
     /// <summary>
@@ -76,6 +79,11 @@ namespace Lcl.RunLib.ApplicationDefinitions
     public AppdefStore? Parent { get; }
 
     /// <summary>
+    /// When true: some commands stay should silent about this store if it does not exist
+    /// </summary>
+    public bool Quiet { get; }
+
+    /// <summary>
     /// The file extension for appdef files
     /// </summary>
     public const string AppdefExtension = ".appdef2.json";
@@ -88,7 +96,8 @@ namespace Lcl.RunLib.ApplicationDefinitions
       switch(location)
       {
         case StoreLocation.System:
-          return AppdefStore.DefaultSystemStore;
+          throw new NotSupportedException("The system store is not enabled in this version");
+          //return AppdefStore.DefaultSystemStoreOld;
         case StoreLocation.User:
           return AppdefStore.DefaultUserStore;
         case StoreLocation.Local:
@@ -100,24 +109,41 @@ namespace Lcl.RunLib.ApplicationDefinitions
     }
 
     /// <summary>
-    /// The AppdefStore exposing the system wide application definitions
+    /// The AppdefStore exposing the system wide application definitions.
+    /// (deprecated)
     /// </summary>
-    public static AppdefStore DefaultSystemStore { get; }
-      = new AppdefStore(SystemStoreFolder, "system", null);
+    public static AppdefStore DefaultSystemStoreOld { get; }
+      = new AppdefStore(SystemStoreFolder, "system", true, null);
 
     /// <summary>
-    /// The AppdefStore exposing the current user's application definitions 
-    /// (using the system store as parent)
+    /// The AppdefStore exposing the current user's application definitions
+    /// and using the old system store as fallback (deprecated)
     /// </summary>
-    public static AppdefStore DefaultUserStore { get; }
-      = new AppdefStore(UserStoreFolder, "user", DefaultSystemStore);
+    public static AppdefStore DefaultUserStoreOld { get; }
+      = new AppdefStore(UserStoreFolder, "user", false, DefaultSystemStoreOld);
 
     /// <summary>
     /// The AppDefStore exposing application definitions in the current directory
-    /// (using the user store as parent)
+    /// and using the old user store as fallback (and the old system store as further
+    /// fallback)
+    /// (deprecated)
+    /// </summary>
+    public static AppdefStore DefaultLocalStoreOld { get; }
+      = new AppdefStore(Environment.CurrentDirectory, "local", true, DefaultUserStoreOld);
+
+    /// <summary>
+    /// The AppdefStore exposing the current user's application definitions
+    /// and not using any fallback
+    /// </summary>
+    public static AppdefStore DefaultUserStore { get; }
+      = new AppdefStore(UserStoreFolder, "user", false, null);
+
+    /// <summary>
+    /// The AppDefStore exposing application definitions in the current directory
+    /// and using the user store as fallback
     /// </summary>
     public static AppdefStore DefaultLocalStore { get; }
-      = new AppdefStore(Environment.CurrentDirectory, "local", DefaultUserStore);
+      = new AppdefStore(Environment.CurrentDirectory, "local", true, DefaultUserStore);
 
     /// <summary>
     /// Get the name of the folder for the current user's application definitions.

@@ -83,7 +83,7 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// </summary>
     public bool ShouldSerializeFullVariableMutations()
     {
-      return FullVariableMutations.Count > 0;
+      return SerializeFullVarsVerbose || FullVariableMutations.Count > 0;
     }
 
     /// <summary>
@@ -101,8 +101,16 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// </summary>
     public bool ShouldSerializeArgumentListMutations()
     {
-      return ArgumentListMutations.Prepend.Count + ArgumentListMutations.Append.Count > 0;
+      return (ArgumentListMutations.Prepend.Count + ArgumentListMutations.Append.Count > 0)
+        || ArgumentListMutations.SerializeVerbose;
     }
+
+    /// <summary>
+    /// When set to true, the full variables map is serialized even when
+    /// empty
+    /// </summary>
+    [JsonIgnore]
+    public bool SerializeFullVarsVerbose { get; set; }
 
     /// <summary>
     /// Applies the mutations defined in this phase to the model.

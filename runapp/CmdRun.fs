@@ -15,7 +15,8 @@ open FsRunUtils
 
 
 let runRun (so:SharedArguments.SharedOptions) target appargs =
-  let store = so.AppdefLocation |> AppdefStore.DefaultStore
+  // let store = so.AppdefLocation |> AppdefStore.DefaultStore
+  let store = AppdefStore.DefaultLocalStore
   let mutation = target |> store.LoadAppdef
   if verbose then
     // Reminder: use eprintf and eprintfn instead of printf and printfn

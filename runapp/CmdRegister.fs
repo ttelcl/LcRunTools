@@ -28,6 +28,8 @@ type private RegisterOptions = {
   Description: string
   VariablesFb: VarAssign list
   ArgumentsFb: string list
+  ArgumentsAppendFb: string list
+  AppdefLocation: StoreLocation
 }
 
 let runRegister so args =
@@ -36,6 +38,15 @@ let runRegister so args =
     | "-v" :: rest ->
       verbose <- true
       rest |> parsemore o
+    | "-h" :: rest | "-help" :: rest | "/h" :: rest | "/help" :: rest ->
+      usage_register false
+      exit 0  // abort
+    | "-usr" :: rest
+    | "-user" :: rest ->
+      rest |> parsemore {o with AppdefLocation = StoreLocation.User}
+    | "-local" :: rest
+    | "-cwd" :: rest ->
+      rest |> parsemore {o with AppdefLocation = StoreLocation.Local}
     | "-x" :: exe :: rest
     | "-exe" :: exe :: rest
     | "-cmd" :: exe :: rest ->
@@ -54,8 +65,11 @@ let runRegister so args =
       rest |> parsemore {o with Force = true}
     | "-d" :: desc :: rest ->
       rest |> parsemore {o with Description = desc}
-    | "-a" :: arg :: rest ->
+    | "-a" :: arg :: rest 
+    | "-ap" :: arg :: rest ->
       rest |> parsemore {o with ArgumentsFb = arg :: o.ArgumentsFb}
+    | "-aa" :: arg :: rest ->
+      rest |> parsemore {o with ArgumentsAppendFb = arg :: o.ArgumentsAppendFb}
     | "-var" :: varname :: varvalue :: rest 
     | "-set" :: varname :: varvalue :: rest ->
       let v = {
@@ -65,8 +79,12 @@ let runRegister so args =
       rest |> parsemore {o with VariablesFb = v :: o.VariablesFb}
     | [] ->
       if o.Executable = null && o.Name = null then
+        usage_register false
         failwith "At least one of '-n' or '-x' should be specified (to determine the appdef name)"
-      {o with ArgumentsFb = o.ArgumentsFb |> List.rev; VariablesFb = o.VariablesFb |> List.rev}
+      {o with
+        ArgumentsFb = o.ArgumentsFb |> List.rev
+        ArgumentsAppendFb = o.ArgumentsAppendFb |> List.rev
+        VariablesFb = o.VariablesFb |> List.rev}
     | x :: _ ->
       x |> failwithf "Unrecognized argument: '%s'"
   let o = args |> parsemore {
@@ -78,6 +96,8 @@ let runRegister so args =
     Description = null
     VariablesFb = []
     ArgumentsFb = []
+    ArgumentsAppendFb = []
+    AppdefLocation = StoreLocation.User
   }
   let exe =
     if o.Executable |> String.IsNullOrEmpty then
@@ -99,7 +119,15 @@ let runRegister so args =
       o.Name
   if name |> AppdefStore.IsValidApptag |> not then
     name |> failwithf "Not a valid apptag (use a -n option to override it): '%s'"
-  let store = so.AppdefLocation |> AppdefStore.DefaultStore
+  // let store = so.AppdefLocation |> AppdefStore.DefaultStore
+  let store =
+    match o.AppdefLocation with
+    | StoreLocation.Local -> AppdefStore.DefaultLocalStore
+    | StoreLocation.User -> AppdefStore.DefaultUserStore
+    | StoreLocation.System ->
+      failwithf "System store support has been disabled"
+    | x ->
+      failwithf "Unrecognized store location code %O" x
   let filename = store.AppdefFileName(name)
   if filename |> File.Exists then
     if o.Force then
@@ -130,9 +158,9 @@ let runRegister so args =
     if o.Description |> String.IsNullOrEmpty |> not then
       o.Description
     elif exe |> String.IsNullOrEmpty |> not then
-      sprintf "(EDITME) Run %s" exe
+      sprintf "(EDIT ME) Run %s" exe
     else
-      sprintf "(EDITME) Application %s" name
+      sprintf "(EDIT ME) Application %s" name
   if o.BaseTag |> String.IsNullOrEmpty |> not then
     if o.BaseTag |> AppdefStore.IsValidApptag |> not then
       failwithf "The given base tag is not a valid apptag: %s" o.BaseTag
@@ -143,7 +171,8 @@ let runRegister so args =
   for vdef in o.VariablesFb do
     vars.[vdef.VarName] <- vdef.VarValue
   let arglist =
-    new ListMutation(prepend = o.ArgumentsFb, append = null)
+    new ListMutation(prepend = o.ArgumentsFb, append = o.ArgumentsAppendFb)
+  arglist.SerializeVerbose <- true
   let tobase =
     new InvocationMutationPhase() // empty!
   let frombase =
@@ -155,6 +184,7 @@ let runRegister so args =
       lists = null,
       args = arglist
       )
+  frombase.SerializeFullVarsVerbose <- true
   let im =
     new InvocationMutation(o.BaseTag, tobase, frombase, description)
   let json = JsonConvert.SerializeObject(im, Formatting.Indented)

@@ -10,17 +10,19 @@ open Lcl.RunLib.ApplicationDefinitions
 open CommonTools
 open ExceptionTool
 open Usage
+open ColorPrint
 
 type ApprunCommand =
   | Run of string
   | List
   | Register
   | Help of string option
+  | Show of string
 
 type SharedOptions = {
   DryRun: bool
   DoDump: bool
-  AppdefLocation: StoreLocation
+  // AppdefLocation: StoreLocation
 }
 
 /// Parse common arguments up to and including the command
@@ -35,15 +37,16 @@ let preparse args =
       rest |> preparsemore {o with DryRun = true}
     | "-dmp" :: rest ->
       rest |> preparsemore {o with DoDump = true}
-    | "-cwd" :: rest
-    | "-local" :: rest ->
-      rest |> preparsemore {o with AppdefLocation = StoreLocation.Local}
-    | "-usr" :: rest
-    | "-user" :: rest ->
-      rest |> preparsemore {o with AppdefLocation = StoreLocation.User}
-    | "-sys" :: rest
-    | "-system" :: rest ->
-      rest |> preparsemore {o with AppdefLocation = StoreLocation.System}
+    //| "-cwd" :: rest
+    //| "-local" :: rest ->
+    //  rest |> preparsemore {o with AppdefLocation = StoreLocation.Local}
+    //| "-usr" :: rest
+    //| "-user" :: rest ->
+    //  rest |> preparsemore {o with AppdefLocation = StoreLocation.User}
+    //| "-sys" :: rest
+    //| "-system" :: rest ->
+    //  failwith "No longer supported: -sys"
+    //  //rest |> preparsemore {o with AppdefLocation = StoreLocation.System}
     | [] ->
       failwith "No command given (an apptag, or -l or -r option)"
     | "/l" :: rest
@@ -62,6 +65,11 @@ let preparse args =
     | "-help" :: rest
     | "/help" :: rest ->
       o, ApprunCommand.Help(None), rest
+    | "/show" :: apptag :: rest ->
+      o, ApprunCommand.Show(apptag), rest
+    | "/show" :: [] ->
+      ecp "\fY'/show' expects an apptag as argument\f0. Running \fY/list\f0 instead"
+      o, ApprunCommand.List, []
     | apptag :: rest when not(apptag.StartsWith('-') || apptag.StartsWith('/')) ->
       o, ApprunCommand.Run(apptag), rest
     | x :: _ when x.StartsWith('/') ->
@@ -70,7 +78,7 @@ let preparse args =
       failwithf "Unrecognized pre-command option: %s" x
   args |> preparsemore {
     DryRun = false
-    AppdefLocation = StoreLocation.User
+    // AppdefLocation = StoreLocation.User
     DoDump = false
   }
 

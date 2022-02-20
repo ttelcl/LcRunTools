@@ -93,16 +93,20 @@ let private colorEscape e ch =
     | x ->
       failwith "Unrecognized color escape marker"
 
-let private render seglist =
+let private render stderr seglist =
   for seg in seglist do
     match seg with
-    | Text(text) -> text |> Console.Write
+    | Text(text) ->
+      if stderr then
+        text |> eprintf "%s"
+      else
+        text |> printf "%s"
     | Foreground(clr) -> Console.ForegroundColor <- clr
     | Background(clr) -> Console.BackgroundColor <- clr
     | Reset -> Console.ResetColor()
     | Nop -> ()  // do nothing
 
-let colprintEx text =
+let xcolprintEx stderr text =
   let keys = [| '\f'; '\v' |]
   let rec splitMore seglist (text:string) =
     let i = text.IndexOfAny(keys)
@@ -119,21 +123,41 @@ let colprintEx text =
       let escapePart = colorEscape key code
       rest |> splitMore (escapePart :: Text(pre) :: seglist)
   let segments = text |> splitMore []
-  segments |> render
+  segments |> render stderr
 
-/// Color-print a string with color escapes (no line break)
+let colprintEx = xcolprintEx false
+
+/// Color-print a string with color escapes to stdout (no line break)
 let colprint text =
   text |> colprintEx
   Console.ResetColor()
 
-/// Color-print a line with color escapes (and a line break)
+/// Color-print a line with color escapes to stdout (and a line break)
 let colprintn text =
   text |> colprint
   Console.WriteLine()
 
-/// Color-print a line with color escapes (and a line break)
+/// Color-print a line with color escapes to stdout (and a line break)
 let cp = colprintn
 
-/// Color-print a string with color escapes (no line break)
+/// Color-print a string with color escapes to stdout (no line break)
 let cpx = colprint
+
+let ecolprintEx = xcolprintEx true
+
+/// Color-print a string with color escapes to stderr (no line break)
+let ecolprint text =
+  text |> ecolprintEx
+  Console.ResetColor()
+
+/// Color-print a line with color escapes to stderr (and a line break)
+let ecolprintn text =
+  text |> ecolprint
+  Console.Error.WriteLine()
+
+/// Color-print a line with color escapes to stderr (and a line break)
+let ecp = ecolprintn
+
+/// Color-print a string with color escapes to stderr (no line break)
+let ecpx = ecolprint
 

@@ -61,7 +61,7 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// </summary>
     public bool ShouldSerializePrepend()
     {
-      return Prepend.Any();
+      return SerializeVerbose || Prepend.Any();
     }
 
     /// <summary>
@@ -69,8 +69,14 @@ namespace Lcl.RunLib.ApplicationDefinitions
     /// </summary>
     public bool ShouldSerializeAppend()
     {
-      return Append.Any();
+      return SerializeVerbose || Append.Any();
     }
+
+    /// <summary>
+    /// When set to true, the 'append' and 'prepend' fields are serialized even when empty
+    /// </summary>
+    [JsonIgnore]
+    public bool SerializeVerbose { get; set; }
 
     /// <summary>
     /// Apply the mutations defined in this object to the given list
