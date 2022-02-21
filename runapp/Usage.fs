@@ -39,14 +39,17 @@ let usage_run brief =
 
 let usage_list brief =
   //cp "\fYrunapp\f0 [\fb-v\f0] [\fb-sys\f0|\fb-usr\f0|\fb-cwd\f0] \fy/list\f0 [\fg-q\f0|\fg-b\f0|\fg-v\f0]"
-  cp "\fYrunapp\f0 [\fb-v\f0] \fy/list\f0 [\fg-q\f0|\fg-b\f0|\fg-v\f0]"
+  cp "\fYrunapp\f0 [\fb-v\f0] \fy/list\f0 [\fg-q\f0|\fg-b\f0|\fg-v\f0] {\fg-m <txt>\f0}"
   if not brief then
     cp "  (alias: \fy/l\f0 instead of \fy/list\f0)"
   cp "  List the registered applications"
   if not brief then
+    cp "\fg-h\f0        Print this /list help message and abort"
     cp "\fg-q\f0        Quiet mode: only list names. Does not check for appdef JSON errors."
     cp "\fg-b\f0        (default) Brief mode: list names, base and command"
     cp "\fg-v\f0        Verbose mode: additionaly list description"
+    cp "\fg-m <txt>\f0  ('match') Only list applications whose names contain \fg<txt>\f0"
+    cp "          Repeatable. If omitted: list all applications"
     cp ""
   
 let usage_register brief =

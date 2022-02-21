@@ -9,6 +9,7 @@ open CommonTools
 open ExceptionTool
 open Usage
 open FsRunUtils
+open ColorPrint
 
 type private ListVerbosity =
   | Quiet = 0
@@ -18,6 +19,7 @@ type private ListVerbosity =
 type private ListOptions = {
   Shared: SharedArguments.SharedOptions
   Verbosity: ListVerbosity
+  Filters: string list
 }
 
 let runCmdlist (so: SharedArguments.SharedOptions) args =
@@ -26,80 +28,77 @@ let runCmdlist (so: SharedArguments.SharedOptions) args =
     | "-v" :: rest ->
       verbose <- true
       rest |> parseMore {o with Verbosity = ListVerbosity.Verbose}
+    | "-h" :: rest | "-help" :: rest | "/h" :: rest | "/help" :: rest ->
+      usage_list false
+      exit 0  // abort
     | "-q" :: rest ->
       rest |> parseMore {o with Verbosity = ListVerbosity.Quiet}
     | "-b" :: rest ->
       rest |> parseMore {o with Verbosity = ListVerbosity.Normal}
+    | "-m" :: filter :: rest ->
+      rest |> parseMore {o with Filters = filter :: o.Filters}
     | x :: _ ->
       x |> failwithf "Unrecognized option for /list: %s"
     | [] ->
-      o
+      {o with Filters = o.Filters |> List.rev}
   let lo =
     args |> parseMore {
       Shared = so
       Verbosity = if verbose then ListVerbosity.Verbose else ListVerbosity.Normal
+      Filters = []
     }
   // let stores = so.AppdefLocation |> AppdefStore.DefaultStore |> storeList
   let stores = AppdefStore.DefaultLocalStore |> storeList
+  let filterTag = // filter according to "-m" options
+    if lo.Filters |> List.isEmpty then
+      fun (tag:string) -> Some(tag)
+    else
+      fun (tag: string) ->
+        if lo.Filters |> List.exists (fun filter -> tag.Contains(filter)) then
+          Some(tag)
+        else
+          None
+  if lo.Filters |> List.isEmpty |> not then
+    cpx "Listing applications matching any of:"
+    for i, f in lo.Filters |> Seq.indexed do
+      if i > 0 then
+        f |> sprintf " / \fg%s\f0" |> cpx
+      else
+        f |> sprintf " \fg%s\f0" |> cpx
+    cp ""
   for store in stores do
     let tags =
       if store.Exists then
-        store.ListAppTags() |> Seq.sort |> Seq.toArray
+        store.ListAppTags() |> Seq.sort |> Seq.choose filterTag |> Seq.toArray
       else
         [||]
     if not(store.Quiet) || tags.Length > 0 then // else: stay quiet
-      printf "In store "
-      color Color.Cyan
-      printf "%-8s" store.Label
-      resetColor()
-      printf " ("
+      store.Label |> sprintf "In store \fc%s\f0 " |> cpx
       if not store.Exists then
-        color Color.DarkRed
-        printf "[missing] "
-        color Color.DarkGray
-        printf "%s" store.Folder
-        resetColor()
-        printfn ")"
+        store.Folder |> sprintf "(\fR[missing]\fk%s\f0)" |> cp
       else
-        color Color.Blue
-        printf "%s" store.Folder
-        resetColor()
-        printfn "):"
+        store.Folder |> sprintf "(\fb%s\f0):" |> cp
         if tags.Length > 0 then
           for tag in tags do
-            color Color.Green
-            printf "  %-20s" tag
-            resetColor()
+            tag |> sprintf "  \fg%-20s\f0" |> cpx
             if lo.Verbosity <> ListVerbosity.Quiet then
               try
                 let im = tag |> store.LoadAppdefBare
                 if im.BaseName <> null then
-                  printf " "
-                  color Color.DarkYellow
-                  printf "<- %s" im.BaseName
-                  resetColor()
-                  printf ""
+                  im.BaseName |> sprintf " \fY<- %s\f0" |> cpx
                 if im.Command |> String.IsNullOrEmpty |> not then
-                  printf " "
-                  color Color.DarkGray
-                  printf "%s" im.Command
-                  resetColor()
+                  im.Command |> sprintf " \fk%s\f0" |> cpx
                 if lo.Verbosity = ListVerbosity.Verbose then
                   if im.Description <> null then
                     printfn ""
                     printf "        %s" im.Description
               with
                 | ex ->
-                  color Color.Red
-                  ex.GetType().Name |> printf " %s:"
-                  ex.Message |> printf "%s"
-                  resetColor()
+                  ex.GetType().Name |> sprintf " \fr%s\f0:" |> cpx
+                  ex.Message |> sprintf " \fY%s\f0" |> cpx
             printfn ""
         else
-          color Color.DarkGray
-          printf "  (no application definitions found)"
-          resetColor()
-          printfn ""
+          "  \fk(no application definitions found)\f0" |> cp
   0
 
 
