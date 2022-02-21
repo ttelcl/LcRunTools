@@ -21,8 +21,8 @@ let run arglist =
   | ApprunCommand.Help(arg) ->
     Usage.runHelp arg
     0
-  | ApprunCommand.Show(apptag) ->
-    failwith "Not yet Implemented: /show"
+  | ApprunCommand.Show ->
+    restargs |> CmdShow.runShow so
 
 [<EntryPoint>]
 let main args =

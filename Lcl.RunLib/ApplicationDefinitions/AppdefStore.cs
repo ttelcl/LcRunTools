@@ -97,7 +97,7 @@ namespace Lcl.RunLib.ApplicationDefinitions
       {
         case StoreLocation.System:
           throw new NotSupportedException("The system store is not enabled in this version");
-          //return AppdefStore.DefaultSystemStoreOld;
+        //return AppdefStore.DefaultSystemStoreOld;
         case StoreLocation.User:
           return AppdefStore.DefaultUserStore;
         case StoreLocation.Local:
@@ -176,7 +176,7 @@ namespace Lcl.RunLib.ApplicationDefinitions
     }
 
     private static char[] __badChars = "\\/: \t\n\r\f".ToCharArray();
-    
+
     /// <summary>
     /// A simple check if the given string may be a valid apptag.
     /// If this returns false, it definitely isn't. If it returns true
@@ -193,6 +193,34 @@ namespace Lcl.RunLib.ApplicationDefinitions
         return false;
       }
       return true;
+    }
+
+    /// <summary>
+    /// Try to find an appdef and report the file name and store it was found in 
+    /// if successfule
+    /// </summary>
+    /// <returns>
+    /// True if successfull, false if not found
+    /// </returns>
+    public bool TryFindAppdefFile(string tag, bool recurse, out string? filename, out AppdefStore? store)
+    {
+      var fullname = AppdefFileName(tag);
+      if(File.Exists(fullname))
+      {
+        filename = fullname;
+        store = this;
+        return true;
+      }
+      if(recurse && Parent != null)
+      {
+        return Parent.TryFindAppdefFile(tag, recurse, out filename, out store);
+      }
+      else
+      {
+        filename = null;
+        store = null;
+        return false;
+      }
     }
 
     /// <summary>

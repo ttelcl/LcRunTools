@@ -17,7 +17,7 @@ type ApprunCommand =
   | List
   | Register
   | Help of string option
-  | Show of string
+  | Show
 
 type SharedOptions = {
   DryRun: bool
@@ -37,16 +37,6 @@ let preparse args =
       rest |> preparsemore {o with DryRun = true}
     | "-dmp" :: rest ->
       rest |> preparsemore {o with DoDump = true}
-    //| "-cwd" :: rest
-    //| "-local" :: rest ->
-    //  rest |> preparsemore {o with AppdefLocation = StoreLocation.Local}
-    //| "-usr" :: rest
-    //| "-user" :: rest ->
-    //  rest |> preparsemore {o with AppdefLocation = StoreLocation.User}
-    //| "-sys" :: rest
-    //| "-system" :: rest ->
-    //  failwith "No longer supported: -sys"
-    //  //rest |> preparsemore {o with AppdefLocation = StoreLocation.System}
     | [] ->
       failwith "No command given (an apptag, or -l or -r option)"
     | "/l" :: rest
@@ -65,8 +55,8 @@ let preparse args =
     | "-help" :: rest
     | "/help" :: rest ->
       o, ApprunCommand.Help(None), rest
-    | "/show" :: apptag :: rest ->
-      o, ApprunCommand.Show(apptag), rest
+    | "/show" :: rest ->
+      o, ApprunCommand.Show, rest
     | "/show" :: [] ->
       ecp "\fY'/show' expects an apptag as argument\f0. Running \fY/list\f0 instead"
       o, ApprunCommand.List, []

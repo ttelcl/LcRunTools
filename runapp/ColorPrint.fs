@@ -1,5 +1,7 @@
 ﻿module ColorPrint
 
+// (c) 2022  ttelcl / ttelcl
+
 open System
 
 (*

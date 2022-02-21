@@ -22,6 +22,7 @@
     <Compile Include="CmdList.fs" />
     <Compile Include="CmdRun.fs" />
     <Compile Include="CmdRegister.fs" />
+    <Compile Include="CmdShow.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
