@@ -10,13 +10,6 @@ let usage_shared brief =
   if not brief then
     cp "\fbShared options\f0:"
     cp "\fb-v\f0        Verbose mode"
-    // Functionality changes:
-    // -sys is disabled
-    // -usr is default for /register (as it was before)
-    // -cwd is default for running and /list
-    //cp "\fb-sys\f0      Only search appdefs in the system search folder"
-    //cp "\fb-usr\f0      (default) Include user and system appdef search paths"
-    //cp "\fb-cwd\f0      Also include the current directory in the appdef search path"
     cp ""
   
 let usage_intro brief =
@@ -28,8 +21,6 @@ let usage_intro brief =
   brief |> usage_shared
   
 let usage_run brief =
-  //cpx "\fYrunapp\f0 [\fb-v\f0] [\fb-sys\f0|\fb-usr\f0|\fb-cwd\f0] [\fb-dry\f0] [\fb-dmp\f0]"
-  //cp " <\fcapptag\f0> <\fgarguments\f0>"
   cp "\fYrunapp\f0 [\fb-v\f0] [\fb-dry\f0] [\fb-dmp\f0] <\fcapptag\f0> <\fgarguments\f0>"
   cp "  Runs the application identified by <\fcapptag\f0> with the given \fgarguments\f0."
   if not brief then
@@ -38,7 +29,6 @@ let usage_run brief =
     cp ""
 
 let usage_list brief =
-  //cp "\fYrunapp\f0 [\fb-v\f0] [\fb-sys\f0|\fb-usr\f0|\fb-cwd\f0] \fy/list\f0 [\fg-q\f0|\fg-b\f0|\fg-v\f0]"
   cp "\fYrunapp\f0 [\fb-v\f0] \fy/list\f0 [\fg-q\f0|\fg-b\f0|\fg-v\f0] {\fg-m <txt>\f0}"
   if not brief then
     cp "  (alias: \fy/l\f0 instead of \fy/list\f0)"
@@ -53,7 +43,6 @@ let usage_list brief =
     cp ""
   
 let usage_register brief =
-  // cp "\fYrunapp\f0 [\fb-v\f0] [\fb-sys\f0|\fb-usr\f0|\fb-cwd\f0] /register <\fgarguments\f0>"
   if not brief then
     cp "\fYrunapp\f0 [\fb-v\f0] \fy/register\f0 <\fgarguments\f0>"
     cp "  (alias: \fy/r\f0 instead of \fy/register\f0)"

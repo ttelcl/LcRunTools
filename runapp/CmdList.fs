@@ -47,7 +47,6 @@ let runCmdlist (so: SharedArguments.SharedOptions) args =
       Verbosity = if verbose then ListVerbosity.Verbose else ListVerbosity.Normal
       Filters = []
     }
-  // let stores = so.AppdefLocation |> AppdefStore.DefaultStore |> storeList
   let stores = AppdefStore.DefaultLocalStore |> storeList
   let filterTag = // filter according to "-m" options
     if lo.Filters |> List.isEmpty then

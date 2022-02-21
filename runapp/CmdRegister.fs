@@ -119,7 +119,6 @@ let runRegister so args =
       o.Name
   if name |> AppdefStore.IsValidApptag |> not then
     name |> failwithf "Not a valid apptag (use a -n option to override it): '%s'"
-  // let store = so.AppdefLocation |> AppdefStore.DefaultStore
   let store =
     match o.AppdefLocation with
     | StoreLocation.Local -> AppdefStore.DefaultLocalStore
@@ -189,11 +188,11 @@ let runRegister so args =
     new InvocationMutation(o.BaseTag, tobase, frombase, description)
   let json = JsonConvert.SerializeObject(im, Formatting.Indented)
 
-  color Color.Red
-  printf "DEBUG"
-  resetColor()
-  printfn ":"
-  printfn "%s" json
+  //color Color.Red
+  //printf "DEBUG"
+  //resetColor()
+  //printfn ":"
+  //printfn "%s" json
 
   if store.Exists |> not then
     printf "Creating store folder: "
