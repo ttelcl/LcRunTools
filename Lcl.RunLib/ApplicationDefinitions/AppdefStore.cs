@@ -154,7 +154,7 @@ namespace Lcl.RunLib.ApplicationDefinitions
         var folder = Path.Combine(
           Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
           "Lcl",
-          "Apprun",
+          "lcrun",
           ".appdefs2");
         return folder;
       }
@@ -169,7 +169,7 @@ namespace Lcl.RunLib.ApplicationDefinitions
         var folder = Path.Combine(Environment.GetFolderPath(
           Environment.SpecialFolder.CommonApplicationData),
           "Lcl",
-          "Apprun",
+          "lcrun",
           ".appdefs2");
         return folder;
       }

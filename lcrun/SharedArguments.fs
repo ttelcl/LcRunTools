@@ -12,7 +12,7 @@ open ExceptionTool
 open Usage
 open ColorPrint
 
-type ApprunCommand =
+type LcrunCommand =
   | Run of string
   | List
   | Register
@@ -41,27 +41,27 @@ let preparse args =
       failwith "No command given (an apptag, or -l or -r option)"
     | "/l" :: rest
     | "/list" :: rest ->
-      o, ApprunCommand.List, rest
+      o, LcrunCommand.List, rest
     | "/r" :: rest
     | "/register" :: rest ->
-      o, ApprunCommand.Register, rest
+      o, LcrunCommand.Register, rest
     | "/h" :: arg :: rest
     | "-h" :: arg :: rest
     | "-help" :: arg :: rest
     | "/help" :: arg :: rest ->
-      o, ApprunCommand.Help(Some(arg)), rest
+      o, LcrunCommand.Help(Some(arg)), rest
     | "/h" :: rest
     | "-h" :: rest
     | "-help" :: rest
     | "/help" :: rest ->
-      o, ApprunCommand.Help(None), rest
+      o, LcrunCommand.Help(None), rest
     | "/show" :: rest ->
-      o, ApprunCommand.Show, rest
+      o, LcrunCommand.Show, rest
     | "/show" :: [] ->
       ecp "\fY'/show' expects an apptag as argument\f0. Running \fY/list\f0 instead"
-      o, ApprunCommand.List, []
+      o, LcrunCommand.List, []
     | apptag :: rest when not(apptag.StartsWith('-') || apptag.StartsWith('/')) ->
-      o, ApprunCommand.Run(apptag), rest
+      o, LcrunCommand.Run(apptag), rest
     | x :: _ when x.StartsWith('/') ->
       failwithf "Unrecognized command: %s" x
     | x :: _ ->

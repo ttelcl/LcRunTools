@@ -12,16 +12,16 @@ open SharedArguments
 let run arglist =
   let so, cmd, restargs = arglist |> preparse
   match cmd with
-  | ApprunCommand.List ->
+  | LcrunCommand.List ->
     restargs |> CmdList.runCmdlist so
-  | ApprunCommand.Run(target) ->
+  | LcrunCommand.Run(target) ->
     restargs |> CmdRun.runRun so target
-  | ApprunCommand.Register ->
+  | LcrunCommand.Register ->
     restargs |> CmdRegister.runRegister so
-  | ApprunCommand.Help(arg) ->
+  | LcrunCommand.Help(arg) ->
     Usage.runHelp arg
     0
-  | ApprunCommand.Show ->
+  | LcrunCommand.Show ->
     restargs |> CmdShow.runShow so
 
 [<EntryPoint>]

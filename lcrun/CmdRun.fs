@@ -80,7 +80,7 @@ let runRun (so:SharedArguments.SharedOptions) target appargs =
     let psi = invocation.Build()
     if verbose then
       bcolor Color.DarkBlue
-      eprintf "---- apprun: Starting process ----"
+      eprintf "---- lcrun: Starting process ----"
       resetColor()
       eprintfn " "
     let exitCode =
@@ -90,7 +90,7 @@ let runRun (so:SharedArguments.SharedOptions) target appargs =
     if verbose then
       bcolor Color.DarkBlue
       color Color.Gray
-      eprintf "---- apprun: Process finished. Status code = "
+      eprintf "---- lcrun: Process finished. Status code = "
       if exitCode = 0 then
         color Color.Green
       else
