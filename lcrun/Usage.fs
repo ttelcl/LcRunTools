@@ -15,13 +15,13 @@ let usage_shared brief =
 let usage_intro brief =
   cp "\fYApplication bootstrapper utility."
   cp "General synopsis is one of:"
-  cp "  \fYrunapp\f0 <\fb-v\f0> <\fcapptag\f0> <\fgarguments\f0>"
-  cp "  \fYrunapp\f0 <\fb-v\f0> \fY/\f0<\fycommand\f0> <\fgcommand-specific-options\f0>"
+  cp "  \fYlcrun\f0 <\fb-v\f0> <\fcapptag\f0> <\fgarguments\f0>"
+  cp "  \fYlcrun\f0 <\fb-v\f0> \fY/\f0<\fycommand\f0> <\fgcommand-specific-options\f0>"
   cp ""
   brief |> usage_shared
   
 let usage_run brief =
-  cp "\fYrunapp\f0 [\fb-v\f0] [\fb-dry\f0] [\fb-dmp\f0] <\fcapptag\f0> <\fgarguments\f0>"
+  cp "\fYlcrun\f0 [\fb-v\f0] [\fb-dry\f0] [\fb-dmp\f0] <\fcapptag\f0> <\fgarguments\f0>"
   cp "  Runs the application identified by <\fcapptag\f0> with the given \fgarguments\f0."
   if not brief then
     cp "\fb-dry\f0      Build the application execution information, but do not actually run it"
@@ -29,7 +29,7 @@ let usage_run brief =
     cp ""
 
 let usage_list brief =
-  cp "\fYrunapp\f0 [\fb-v\f0] \fy/list\f0 [\fg-q\f0|\fg-b\f0|\fg-v\f0] {\fg-m <txt>\f0}"
+  cp "\fYlcrun\f0 [\fb-v\f0] \fy/list\f0 [\fg-q\f0|\fg-b\f0|\fg-v\f0] {\fg-m <txt>\f0}"
   if not brief then
     cp "  (alias: \fy/l\f0 instead of \fy/list\f0)"
   cp "  List the registered applications"
@@ -44,11 +44,11 @@ let usage_list brief =
   
 let usage_register brief =
   if not brief then
-    cp "\fYrunapp\f0 [\fb-v\f0] \fy/register\f0 <\fgarguments\f0>"
+    cp "\fYlcrun\f0 [\fb-v\f0] \fy/register\f0 <\fgarguments\f0>"
     cp "  (alias: \fy/r\f0 instead of \fy/register\f0)"
   else
-    cp "\fYrunapp\f0 [\fb-v\f0] \fy/register\f0 \fw...\f0"
-    cp "  (use '\fYrunapp /help register\f0' or '\fYrunapp /register -h\f0' for full help)"
+    cp "\fYlcrun\f0 [\fb-v\f0] \fy/register\f0 \fw...\f0"
+    cp "  (use '\fYlcrun /help register\f0' or '\fYlcrun /register -h\f0' for full help)"
   cp "  Create a new (stub) appdef file. Consider further tuning in a text editor."
   if not brief then
     cp "\fg-h\f0 \fx\fx\fx\fx               Print this /register help message and abort"
@@ -63,11 +63,11 @@ let usage_register brief =
     cp "\fg-F\f0 \fx\fx\fx\fx               Enable overwriting an existing appdef"
   
 let usage_show brief =
-  cp "\fYrunapp \fy/show\f0 <\fcapptag\f0>"
+  cp "\fYlcrun \fy/show\f0 <\fcapptag\f0>"
   cp "  Print the application definition (and base definitions)"
 
 let usage_help brief =
-  cp "\fYrunapp\f0 \fy/help\f0 [\fg/<command>\f0]"
+  cp "\fYlcrun\f0 \fy/help\f0 [\fg/<command>\f0]"
   cp "  Print a more detailed version of this help message or the command's help message"
   if not brief then
     cp "\fg/<command>\f0        Only list help for the command (use '\fg/run\f0' for running help)"

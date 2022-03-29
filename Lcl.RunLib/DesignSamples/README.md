@@ -13,14 +13,14 @@ It can be run stand-alone to start an interactive python
 session in this virtual environment by invoking
 
 ```bat
-runapp pyenv-3-10.venv
+lcrun pyenv-3-10.venv
 ```
 
 Or you can use it to run python scripts in this environment. 
 For example, to run pip and list the installed packages:
 
 ```bat
-runapp pyenv-3-10.venv -m pip list
+lcrun pyenv-3-10.venv -m pip list
 ```
 
 Here is the content of this appdef:
@@ -46,7 +46,7 @@ A few observations:
 * There is no need to modify the path explicitly, like the actual
   virtual environment activation script does: the directory where
   the command to execute resides is automatically prepended by
-  `runapp`, unless you opt out of that feature explicitly
+  `lcrun`, unless you opt out of that feature explicitly
 * Since this appdef has no base, it doesn't really matter if you
   use the `tobase` or the `frombase` section. By convention 
   use the `frombase` one.
@@ -66,7 +66,7 @@ same command as was shown at the end of the previous example
 you can run:
 
 ```batch
-runapp pip-3-10 list
+lcrun pip-3-10 list
 ```
 
 Here is the content of this appdef:
