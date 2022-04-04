@@ -1,5 +1,7 @@
 ﻿# lcrun - CLI application bootstrapper
 
+> :warning: This is a work in progress
+
 ## Background
 
 I tend to craft many command line applications, most commonly as
