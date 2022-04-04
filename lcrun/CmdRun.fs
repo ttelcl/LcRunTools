@@ -47,20 +47,10 @@ let runRun (so:SharedArguments.SharedOptions) target appargs =
     //eprintfn " "
     ecp "\vBCommand and arguments:\v0 "
     
-    //eprintf "  "
-    //bcolor Color.DarkBlue
-    //color Color.Yellow
-    //eprintf "%s" invocation.Executable
-    //resetColor()
-    //eprintfn " "
-    sprintf "  \vB\fy%s\f0 " invocation.Executable |> ecp
+    sprintf "  \vB\fy%s\f0" invocation.Executable |> ecpx
     for arg in invocation.Arguments do
-      //eprintf "  "
-      //bcolor Color.DarkBlue
-      //eprintf "%s" arg
-      //resetColor()
-      //eprintfn " "
-      sprintf "  \vB%s\v0 " arg |> ecp
+      sprintf " \vB%s\v0" arg |> ecpx
+    ecp " "
     //bcolor Color.DarkBlue
     //eprintf "Start folder:"
     //resetColor()
@@ -112,7 +102,8 @@ let runRun (so:SharedArguments.SharedOptions) target appargs =
       //eprintf " ----"
       //resetColor()
       //eprintfn " "
-      sprintf "\vB\fa---- lcrun: Process finished. Status code = " |> ecpx
-      (if exitCode = 0 then "\fg" else "\fr") |> ecpx
+      //   Reminder: use ecolprintEx instead of ecpx, to avoid auto-reseting the background
+      sprintf "\vB\fa---- lcrun: Process finished. Status code = " |> ecolprintEx
+      (if exitCode = 0 then "\fg" else "\fr") |> ecolprintEx
       sprintf "%d\fa ----\v0 " exitCode |> ecp
     exitCode  

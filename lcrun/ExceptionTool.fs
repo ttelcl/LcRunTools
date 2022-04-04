@@ -24,7 +24,7 @@ let rec fancyExceptionPrint showTrace (ex:Exception) =
           if frame.HasSource() then
             let fnm = frame.GetFileName()
             color Color.Red
-            eprintf "%15s" (Path.GetFileName(fnm))
+            eprintf "%25s" (Path.GetFileName(fnm))
             resetColor()
             eprintf ":"
             color Color.Green
