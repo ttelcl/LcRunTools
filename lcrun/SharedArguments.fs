@@ -38,7 +38,7 @@ let preparse args =
     | "-dmp" :: rest ->
       rest |> preparsemore {o with DoDump = true}
     | [] ->
-      failwith "No command given (an apptag, or -l or -r option)"
+      failwith "No command given (an apptag, or /list, /register or /show keyword)"
     | "/l" :: rest
     | "/list" :: rest ->
       o, LcrunCommand.List, rest

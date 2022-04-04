@@ -10,6 +10,7 @@ open Newtonsoft.Json
 open Lcl.RunLib.ApplicationDefinitions
 
 open CommonTools
+open ColorPrint
 open ExceptionTool
 open Usage
 open FsRunUtils
@@ -130,29 +131,32 @@ let runRegister so args =
   let filename = store.AppdefFileName(name)
   if filename |> File.Exists then
     if o.Force then
-      color Color.DarkYellow
-      printf "Warning! Overwriting existing "
-      color Color.Yellow
-      printf "%s" filename
-      resetColor()
-      printfn " ."
+      //color Color.DarkYellow
+      //printf "Warning! Overwriting existing "
+      //color Color.Yellow
+      //printf "%s" filename
+      //resetColor()
+      //printfn " ."
+      sprintf "\foWarning! Overwriting existing \fy%s \f0." filename |> cp
     else
       filename |> failwithf "Appdef already exists (use -F to overwrite): %s"
   else
     let upfile = name |> store.FindAppdefFile
     if upfile <> null then
-      color Color.DarkYellow
-      printf "Warning! The new appdef will shadow the existing appdef at "
-      color Color.Yellow
-      upfile |> printf "%s"
-      resetColor()
-      printfn " ."
+      //color Color.DarkYellow
+      //printf "Warning! The new appdef will shadow the existing appdef at "
+      //color Color.Yellow
+      //upfile |> printf "%s"
+      //resetColor()
+      //printfn " ."
+      sprintf "\foWarning! The new appdef will shadow the existing appdef at \fy%s \f0." upfile |> cp
   if (o.BaseTag |> String.IsNullOrEmpty) && (o.Executable |> String.IsNullOrEmpty) then
     // While this is likely an error, there are valid use cases imaginable where this happens.
-    color Color.DarkYellow
-    printf "Warning! Neither -x nor -base is specified. The resulting appdef will not be usable stand-alone"
-    resetColor()
-    printfn "."
+    //color Color.DarkYellow
+    //printf "Warning! Neither -x nor -base is specified. The resulting appdef will not be usable stand-alone"
+    //resetColor()
+    //printfn "."
+    sprintf "\foWarning! Neither -x nor -base is specified. The resulting appdef will not be usable stand-alone\f0." |> cp
   let description =
     if o.Description |> String.IsNullOrEmpty |> not then
       o.Description
@@ -195,11 +199,12 @@ let runRegister so args =
   //printfn "%s" json
 
   if store.Exists |> not then
-    printf "Creating store folder: "
-    color Color.Yellow
-    store.Folder |> printf "%s"
-    resetColor()
-    printfn "."
+    //printf "Creating store folder: "
+    //color Color.Yellow
+    //store.Folder |> printf "%s"
+    //resetColor()
+    //printfn "."
+    sprintf "Creating store folder: \fy%s \f0." store.Folder |> cp
     store.Folder |> Directory.CreateDirectory |> ignore
   do
     use txt = filename |> startFile

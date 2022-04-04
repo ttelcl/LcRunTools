@@ -46,12 +46,17 @@ Usage examples:
 
 cp "Hello \fggreen\f0 \foworld\f0! (\vRthis is a test\v0)"
 
-To combine string formatting and coloration use Printf.kprintf
+To combine string formatting and coloration you can use Printf.kprintf or sprintf
 
-open Printf
-let num = 42
-let s = "Boo!"
-kprintf cp "The answer was \fr%d\f0. \fy%s\f0" num s
+  let num = 42
+  let s = "Boo!"
+
+  open Printf
+  kprintf cp "The answer was \fr%d\f0. \fy%s\f0" num s
+
+or:
+
+  sprintf "The answer was \fr%d\f0. \fy%s\f0" num s |> cp
 
 *)
 

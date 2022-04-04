@@ -61,10 +61,13 @@ let usage_register brief =
     cp "\fg-var\f0 <\fGvar\f0> <\fGval\f0>  An environment variable to set (frombase). Repeatable"
     cp "\fg-d\f0 <\fGdesc\f0> \fx\fx        A description message. If omitted a stub will be generated"
     cp "\fg-F\f0 \fx\fx\fx\fx               Enable overwriting an existing appdef"
+    cp ""
   
 let usage_show brief =
   cp "\fYlcrun \fy/show\f0 <\fcapptag\f0>"
   cp "  Print the application definition (and base definitions)"
+  if not brief then
+    cp ""
 
 let usage_help brief =
   cp "\fYlcrun\f0 \fy/help\f0 [\fg/<command>\f0]"
