@@ -36,11 +36,12 @@ arguments providing a minimal layer between the command shell and the
 actual application. That is what "lcrun" provides. And once you have a
 layer between the shell and the actual application you want to execute,
 you can use that same mechanism to tweak the application invocation,
-for instance modify the PATH or other environment variables, or 
+for instance modify the PATH or other environment variables, or
 prepend or append extra arguments.
 
 ## How it works
-Say, for example, that you built a commandline application named 
+
+Say, for example, that you built a commandline application named
 "myapp.exe". However, your PATH is already kindof full and you don't
 want to put it directly on the PATH. Nor do you want to remember its
 exact full path.
@@ -74,7 +75,7 @@ that.
   couldn't name it "run". It also turns out that simply "run" may
   cause conflicts with other existing tools.
 * The original name for this new version was "runapp". It turned out
-  that that name had some problems too. Most importantly: I kept 
+  that that name had some problems too. Most importantly: I kept
   having to check if it was "runapp" or "apprun". If I, as author,
   have to keep checking that, that is not a sign of a good name...
 * In fact I noticed that even the code was referring to "runapp" at
@@ -93,6 +94,3 @@ TBD
 ## Usage
 
 TBD
-
-
-
