@@ -15,6 +15,7 @@
     <None Include="README.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="CommonTools.fs" />
     <Compile Include="ColorPrint.fs" />
     <Compile Include="PrintUtils.fs" />
@@ -29,8 +30,6 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
 
-  <ItemGroup />
-
   <ItemGroup>
     <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
   </ItemGroup>
@@ -42,5 +41,10 @@
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="6.0.3" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Required to ensure the attributes in AssemblyInfo.fs are actually used -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
 
 </Project>
