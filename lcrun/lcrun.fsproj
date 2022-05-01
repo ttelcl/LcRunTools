@@ -9,11 +9,20 @@
     <!-- This prevents other language resources being emitted -->
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Description>lcrun - application bootstrap utility</Description>
+    <PackageProjectUrl>https://github.com/ttelcl/LcRunTools</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/ttelcl/LcRunTools</RepositoryUrl>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="README.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
     <Compile Include="CommonTools.fs" />
     <Compile Include="ColorPrint.fs" />
