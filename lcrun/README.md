@@ -222,6 +222,49 @@ extends the base application.
       via bases, there is a practical limit of 10 levels to guard
       against accidental infinite recursion.
 
+### Application context building process
+
+The application definition file(s) are used to construct an 
+_"application context"_ that gathers all information needed to run
+the intended application. It contains the executable, working directory,
+environment variables and arguments for the application. Understanding
+how this context is built is easiest when looking at an application that
+has a base application.
+
+The basic principle is that _lcrun_ starts with a default environment,
+which then goes through a series of modification steps before ending
+up at the final version. Each application definition file contains
+two such modification sections, one called _"tobase"_ and the other 
+called _"frombase"_. The process works as follows:
+
+* Start out with a default context, containing the environment variables
+  passed to _lcrun_ itself, using the current working directory, 
+  containing the arguments passed to _lcrun_, and not defining any 
+  executable just yet.
+* Apply the modifications from the _tobase_ section of the main
+  application definition file.
+* Apply the modifications from the _tobase_ section of the base
+  application definition file.
+* Repeat for all further bases, until you arrive at a base-less
+  appdef.
+* Now go through all application definition files again, but in 
+  reverse order, applying the modifications from the _frombase_
+  sections. So first apply the _frombase_ section of the final
+  base application definition, then go back to the previous appdef,
+  and so on, all the way until you are back at the initial application
+  definition's _frombase_ section.
+
+Now do a few steps and sanity checks:
+
+* It is an error if at this point there is no executable set.
+* Unless specified otherwise, prepend the directory of the excutable
+  to the PATH.
+* Construct the final environment (paying special attention to
+  variables that were deleted)
+
+... and then we have everything that is needed to actually run the
+application.
+
 ### Application definition file structure
 
 TBD
