@@ -1,6 +1,9 @@
 ﻿// (c) 2022  ttelcl / ttelcl
 module Usage
 
+open System
+open System.Reflection
+
 open CommonTools
 open PrintUtils
 open ColorPrint
@@ -13,7 +16,10 @@ let usage_shared brief =
     cp ""
   
 let usage_intro brief =
-  cp "\fYApplication bootstrapper utility."
+  let asm = Assembly.GetExecutingAssembly()
+  let ver = asm.GetName().Version
+  cp $"\fglcrun\f0 (\fc{ver}\f0) - \fYApplication bootstrap utility."
+  cp ""
   cp "General synopsis is one of:"
   cp "  \fYlcrun\f0 <\fb-v\f0> <\fcapptag\f0> <\fgarguments\f0>"
   cp "  \fYlcrun\f0 <\fb-v\f0> \fY/\f0<\fycommand\f0> <\fgcommand-specific-options\f0>"
