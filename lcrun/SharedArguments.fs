@@ -55,11 +55,12 @@ let preparse args =
     | "-help" :: rest
     | "/help" :: rest ->
       o, LcrunCommand.Help(None), rest
+    //| "/show" :: [] ->
+    //  ecp "\fY'/show' expects an apptag as argument\f0. Running \fY/list\f0 instead"
+    //  o, LcrunCommand.List, []
+    | "/s" :: rest
     | "/show" :: rest ->
       o, LcrunCommand.Show, rest
-    | "/show" :: [] ->
-      ecp "\fY'/show' expects an apptag as argument\f0. Running \fY/list\f0 instead"
-      o, LcrunCommand.List, []
     | apptag :: rest when not(apptag.StartsWith('-') || apptag.StartsWith('/')) ->
       o, LcrunCommand.Run(apptag), rest
     | x :: _ when x.StartsWith('/') ->
