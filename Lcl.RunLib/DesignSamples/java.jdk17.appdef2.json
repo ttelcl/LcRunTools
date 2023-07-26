@@ -1,0 +1,28 @@
+{
+  "description": "JDK 17 java (17.0.7.7)",
+  "base": null,
+  "tobase": {},
+  "frombase": {
+    "command": "C:\\Program Files\\Microsoft\\jdk-17.0.7.7-hotspot\\bin\\java.exe",
+    "vars": {
+      "JAVA_HOME": "C:\\Program Files\\Microsoft\\jdk-17.0.7.7-hotspot"
+    },
+    "args": {
+      "prepend": [
+        "-Dfile.encoding=UTF-8"
+      ],
+      "append": []
+    },
+    "lists": {
+      "PATH": {
+        "sep": ";",
+        "prepend": []
+      },
+      "CLASSPATH": {
+        "sep": ";",
+        "prepend": [],
+        "append": []
+      }
+    }
+  }
+}

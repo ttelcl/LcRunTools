@@ -1,0 +1,28 @@
+{
+  "description": "Testing how to run a java app",
+  "base": "java.jdk17",
+  "tobase": {},
+  "frombase": {
+    "command": null,
+    "vars": {
+    },
+    "args": {
+      "prepend": [],
+      "append": [
+        "org.ttelcl.Main"
+      ]
+    },
+    "lists": {
+      "CLASSPATH": {
+        "sep": ";",
+        "prepend": [],
+        "append": [
+          "C:\\e\\src\\java\\mavenPlayground\\target\\classes",
+          "C:\\Users\\luc.cluitmans\\.m2\\repository\\com\\fasterxml\\jackson\\core\\jackson-databind\\2.15.1\\jackson-databind-2.15.1.jar",
+          "C:\\Users\\luc.cluitmans\\.m2\\repository\\com\\fasterxml\\jackson\\core\\jackson-annotations\\2.15.1\\jackson-annotations-2.15.1.jar",
+          "C:\\Users\\luc.cluitmans\\.m2\\repository\\com\\fasterxml\\jackson\\core\\jackson-core\\2.15.1\\jackson-core-2.15.1.jar"
+        ]
+      }
+    }
+  }
+}
